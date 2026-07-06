@@ -7,6 +7,7 @@ import {
   Boxes,
   ChevronDown,
   Code2,
+  Info,
   Layers,
   LayoutDashboard,
   LayoutGrid,
@@ -118,6 +119,12 @@ const NAV_MENUS: MenuGroup[] = [
   {
     label: "Company",
     items: [
+      {
+        label: "About",
+        href: "/about",
+        icon: Info,
+        description: "Independent and bootstrapped — the team behind Hypero.",
+      },
       {
         label: "Solutions",
         href: "/solutions",

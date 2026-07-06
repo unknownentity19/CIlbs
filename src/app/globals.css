@@ -165,31 +165,6 @@ body {
   color: transparent;
 }
 
-/* Gradient border helper */
-.gradient-border {
-  position: relative;
-  isolation: isolate;
-}
-.gradient-border::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(
-    135deg,
-    rgb(var(--gradient-from) / 0.6),
-    rgb(var(--gradient-via) / 0.4),
-    rgb(var(--gradient-to) / 0.6)
-  );
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
-}
-
 /* Scrollbar */
 ::-webkit-scrollbar {
   width: 10px;
@@ -214,13 +189,10 @@ body {
   border-radius: 6px;
 }
 
-/* Floating animation for hero nodes */
+/* Floating animation for hero floaters */
 @keyframes float-y {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-12px); }
-}
-.animate-float {
-  animation: float-y 6s ease-in-out infinite;
 }
 
 /* Hero floaters: one-shot opacity entrance combined with the continuous
@@ -242,17 +214,6 @@ body {
     opacity: 1;
     animation: none;
   }
-}
-
-/* Pulse line for diagrams */
-@keyframes pulse-line {
-  0% { stroke-dashoffset: 100; opacity: 0.2; }
-  50% { opacity: 1; }
-  100% { stroke-dashoffset: 0; opacity: 0.2; }
-}
-.animate-pulse-line {
-  stroke-dasharray: 6 6;
-  animation: pulse-line 3s ease-in-out infinite;
 }
 
 /* Per-route fade-in. `backwards` makes the start state apply before the
@@ -364,9 +325,7 @@ body {
   .animate-overlay-in,
   .animate-dialog-in,
   .animate-edge-pulse,
-  .animate-float,
   .animate-grid,
-  .animate-pulse-line,
   .animate-ping {
     animation: none;
   }

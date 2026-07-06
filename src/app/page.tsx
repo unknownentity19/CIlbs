@@ -75,13 +75,12 @@ const TONES = [
 const tone = (i: number) => TONES[i % TONES.length]!;
 
 const TRUSTED = [
-  "Linear",
-  "Loom",
-  "Vercel",
-  "Notion",
-  "Stripe",
-  "Retool",
-  "Ramp",
+  "Y Combinator",
+  "Sequoia",
+  "Andreessen Horowitz",
+  "Accel",
+  "Index Ventures",
+  "South Park Commons",
 ];
 
 const VALUE_PROPS = [
@@ -320,7 +319,7 @@ export default function HomePage() {
         <Container>
           <Reveal>
             <p className="text-center text-xs uppercase tracking-wider text-muted-foreground">
-              Used by builders at
+              Backed by
             </p>
           </Reveal>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-x-10 gap-y-4 opacity-70">
