@@ -14,7 +14,7 @@ env:
   # newer than itself, so a Postgres 18 database and Ubuntu's default client
   # (16) would fail every night with a version mismatch. Keep this in step
   # with the Postgres version of the database it points at.
-  PG_MAJOR: "17"
+  PG_MAJOR: "18"
 
 jobs:
   dump:

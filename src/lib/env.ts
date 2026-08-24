@@ -19,6 +19,9 @@ const schema = z.object({
   /** Postgres connection string (Neon's pooled URL in production). */
   DATABASE_URL: z.string().url().optional(),
 
+  /** Unpooled connection, used only by drizzle-kit for schema migrations. */
+  DIRECT_URL: z.string().url().optional(),
+
   /** Session signing secret. Required once auth is in use. */
   AUTH_SECRET: z.string().min(32).optional(),
 

@@ -13,13 +13,24 @@ test.describe("studio", () => {
   test.skip(({ isMobile }) => !!isMobile, "desktop layout only");
 
   test.beforeEach(async ({ page }) => {
+    // Discarding is the point of the reset below, so say yes to the prompt.
+    page.on("dialog", (dialog) => void dialog.accept());
+
     await page.goto("/studio");
-    // Start from a known graph rather than whatever the last run left behind.
     await page.evaluate(() =>
       window.localStorage.removeItem("cilbs.studio.workflow.v1"),
     );
     await page.reload();
     await expect(page.locator('[data-hydrated="true"]')).toBeVisible();
+
+    // These specs share one account, so its saved workflow carries over
+    // between runs — without this, every run's leftover nodes pile up in the
+    // next one's assertions. Loading a template gives a known starting graph
+    // whatever came before.
+    await page.getByRole("button", { name: "Lead router" }).first().click();
+    await expect(
+      page.getByText(/Saved (in this browser|to your account)/),
+    ).toBeVisible({ timeout: 20_000 });
   });
 
   test("loads a template and simulates a run", async ({ page }) => {

@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { getSession } from "@/auth";
+import { hasDatabase } from "@/lib/env";
 import { StudioView } from "./studio-view";
 
 /**
@@ -26,5 +27,11 @@ export default async function StudioPage() {
   if (!session?.user?.id) {
     redirect("/signin?next=/studio");
   }
-  return <StudioView />;
+  // Told to the client rather than rediscovered there. The browser only learns
+  // it has a session once `useSession` finishes its own request, and in that
+  // gap the editor would decide it had no server storage, save to the browser,
+  // then change its mind — which showed up as "Saved in this browser" for a
+  // signed-in visitor and a spurious "unsaved changes" warning when the sink
+  // switched underneath the dirty check.
+  return <StudioView cloudAvailable={hasDatabase()} />;
 }

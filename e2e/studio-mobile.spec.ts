@@ -10,12 +10,26 @@ test.describe("studio on a phone", () => {
   test.skip(({ isMobile }) => !isMobile, "mobile layout only");
 
   test.beforeEach(async ({ page }) => {
+    page.on("dialog", (dialog) => void dialog.accept());
+
     await page.goto("/studio");
     await page.evaluate(() =>
       window.localStorage.removeItem("cilbs.studio.workflow.v1"),
     );
     await page.reload();
     await expect(page.locator('[data-hydrated="true"]')).toBeVisible();
+
+    // Same reason as the desktop spec: the account's saved workflow persists
+    // between runs, so start from a template. On a phone the templates live
+    // in the bottom sheet.
+    await page.getByRole("button", { name: /^Add$/ }).click();
+    await page
+      .getByTestId("studio-sheet")
+      .getByRole("button", { name: "Lead router" })
+      .click();
+    await expect(page.getByText(/Saved (in this browser|to your account)/)).toBeVisible({
+      timeout: 20_000,
+    });
   });
 
   // The desktop rails stay mounted (hidden by CSS) at this width, so every

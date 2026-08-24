@@ -147,11 +147,16 @@ a form that cannot work.
    one this is tuned for. Copy the **pooled** connection string (the host with
    `-pooler` in it) so serverless instances don't exhaust the connection limit.
 2. Generate a session secret: `openssl rand -base64 32`.
-3. Put both in `.env.local` (see `.env.example`), then apply the schema:
+3. Put them in `.env.local` (see `.env.example`), then apply the schema:
 
 ```bash
 npm run db:migrate
 ```
+
+`drizzle.config.ts` loads `.env.local` itself, so the connection string never
+has to go on a command line where your shell would record it. It prefers
+`DIRECT_URL` when set — Neon's pooler is right for the app's short queries,
+but schema changes are better off talking to the database directly.
 
 4. Set the same two variables in your host's project settings before deploying.
 

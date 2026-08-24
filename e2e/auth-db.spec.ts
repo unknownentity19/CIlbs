@@ -34,6 +34,18 @@ test.describe("accounts", () => {
     await page.getByLabel("Password").fill(password);
     await page.getByRole("button", { name: /Create free account/i }).click();
 
+    // Sign-up is rate limited per IP. CI gets a fresh server every run and
+    // never trips it; running this suite repeatedly against one long-lived
+    // local server does. That's the protection working, not a failure.
+    const rateLimited = await page
+      .getByText(/too many sign-up attempts/i)
+      .isVisible()
+      .catch(() => false);
+    test.skip(
+      rateLimited,
+      "sign-up rate limit reached — restart the server to clear it",
+    );
+
     // Creating an account signs you straight in.
     await expect(page).toHaveURL(/\/dashboard/, { timeout: 20_000 });
     await expect(page.getByText(/Ada/).first()).toBeVisible();
@@ -80,6 +92,11 @@ test.describe("accounts", () => {
     await page.getByLabel(/^(Work )?email$/i).fill(email);
     await page.getByLabel("Password").fill(password);
     await page.getByRole("button", { name: /Create free account/i }).click();
+    const limited = await page
+      .getByText(/too many sign-up attempts/i)
+      .isVisible()
+      .catch(() => false);
+    test.skip(limited, "sign-up rate limit reached — restart the server to clear it");
     await expect(page.getByText(/already exists/i)).toBeVisible();
   });
 });

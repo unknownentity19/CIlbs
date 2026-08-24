@@ -97,7 +97,13 @@ function wouldCycle(edges: Edge[], from: string, to: string) {
 type SidePanel = "run" | "issues";
 type Sheet = "palette" | "inspector" | "run" | null;
 
-export function StudioView() {
+export function StudioView({
+  /** Whether this deployment can store workflows server-side. Comes from the
+   * server, which knows before the browser does. */
+  cloudAvailable = false,
+}: {
+  cloudAvailable?: boolean;
+}) {
   // Render the deterministic seed during SSR / first paint to avoid a
   // hydration mismatch (templates use random ids). The real workflow is
   // swapped in by the effect below.
@@ -117,9 +123,9 @@ export function StudioView() {
   const abortRef = React.useRef<AbortController | null>(null);
   const fileRef = React.useRef<HTMLInputElement | null>(null);
   const { user } = useAuth();
-  // Whether this account can store workflows server-side. False on
-  // deployments with no database, where the draft stays in this browser.
-  const [cloud, setCloud] = React.useState(false);
+  // Whether this account can store workflows server-side. Seeded from the
+  // server so it is right on the first render, not a second later.
+  const [cloud, setCloud] = React.useState(cloudAvailable);
   // Where a click-added node should land: the middle of what the user can see.
   const viewCenterRef = React.useRef({ x: 240, y: 192 });
 
@@ -185,7 +191,9 @@ export function StudioView() {
     async function hydrate() {
       const local = loadFromStorage();
 
-      const storage = user?.id
+      // Keyed on what the server said, not on the client session, which may
+      // still be resolving on the first pass.
+      const storage = cloudAvailable
         ? await loadLatestWorkflow()
         : { available: false, workflow: null };
       if (cancelled) return;
@@ -235,7 +243,7 @@ export function StudioView() {
     // Keyed on the user *id*, not the user object: next-auth hands back a new
     // session object on every window focus, and depending on the object made
     // this effect — and its history reset — run on every tab switch.
-  }, [resetHistory, user?.id, markPersisted, notify]);
+  }, [resetHistory, cloudAvailable, user?.id, markPersisted, notify]);
 
   // Make sure any pending run is cancelled when this page unmounts. Without
   // this, navigating away mid-run leaves the runner pushing setState calls

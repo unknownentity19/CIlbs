@@ -76,10 +76,15 @@ test("robots keeps crawlers out of the gated pages", async ({ request }) => {
 test.describe("sign-in", () => {
   test("offers only the sign-in methods that are configured", async ({
     page,
+    request,
   }) => {
+    // This asserts the *unconfigured* state, so it has to check rather than
+    // assume: a local .env.local or a configured deployment makes the sign-in
+    // methods legitimately present.
+    const providers = await (await request.get("/api/auth/providers")).json();
     test.skip(
-      process.env.E2E_WITH_DB === "1",
-      "asserts the unconfigured state; a database makes the email form legitimate",
+      providers !== null && Object.keys(providers ?? {}).length > 0,
+      "sign-in is configured here, so there is no unconfigured state to assert",
     );
     await page.goto("/signin");
 

@@ -52,7 +52,7 @@ jobs:
     # being skipped.
     services:
       postgres:
-        image: postgres:17
+        image: postgres:18
         env:
           POSTGRES_USER: cilbs
           POSTGRES_PASSWORD: cilbs
