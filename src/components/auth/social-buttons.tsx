@@ -4,7 +4,6 @@ import * as React from "react";
 import { signIn } from "next-auth/react";
 import { Loader2 } from "lucide-react";
 import { GitHubIcon, GoogleIcon } from "@/components/auth/social-icons";
-import { useAuthProviders } from "@/components/auth/use-providers";
 
 /**
  * OAuth sign-in buttons.
@@ -14,6 +13,9 @@ import { useAuthProviders } from "@/components/auth/use-providers";
  * for providers the deployment actually has credentials for: asking Auth.js
  * for an unconfigured provider is a 500, and a button that cannot work is
  * worse than no button.
+ *
+ * The list arrives as a prop from the server. Fetching it here cost a request
+ * per mount and left the page in a loading state that looked broken.
  */
 
 const LABELS: Record<string, { label: string; icon: React.ReactNode }> = {
@@ -22,11 +24,12 @@ const LABELS: Record<string, { label: string; icon: React.ReactNode }> = {
 };
 
 export function SocialButtons({
+  oauth,
   callbackUrl = "/dashboard",
 }: {
+  oauth: string[];
   callbackUrl?: string;
 }) {
-  const { oauth } = useAuthProviders();
   const [pending, setPending] = React.useState<string | null>(null);
 
   if (!oauth.length) return null;
