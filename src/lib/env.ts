@@ -11,35 +11,48 @@ import { z } from "zod";
  * that they are not set up rather than crashing.
  */
 
+/**
+ * Treats an empty or whitespace-only variable as absent.
+ *
+ * A dashboard-created variable that was never filled in arrives as `""`, which
+ * is a string — so `.optional()` alone doesn't help and `.url()` rejects it,
+ * turning a blank field into a hard failure on every request.
+ */
+const blankAsUndefined = <T extends z.ZodTypeAny>(inner: T) =>
+  z.preprocess(
+    (raw) => (typeof raw === "string" && raw.trim() === "" ? undefined : raw),
+    inner,
+  );
+
 const schema = z.object({
   NODE_ENV: z
     .enum(["development", "test", "production"])
     .default("development"),
 
   /** Postgres connection string (Neon's pooled URL in production). */
-  DATABASE_URL: z.string().url().optional(),
+  DATABASE_URL: blankAsUndefined(z.string().url().optional()),
 
   /** Unpooled connection, used only by drizzle-kit for schema migrations. */
-  DIRECT_URL: z.string().url().optional(),
+  DIRECT_URL: blankAsUndefined(z.string().url().optional()),
 
   /** Session signing secret. Required once auth is in use. */
-  AUTH_SECRET: z.string().min(32).optional(),
+  AUTH_SECRET: blankAsUndefined(z.string().min(32).optional()),
 
   /** Canonical origin, used for absolute URLs in metadata and emails. */
-  NEXT_PUBLIC_SITE_URL: z.string().url().optional(),
+  NEXT_PUBLIC_SITE_URL: blankAsUndefined(z.string().url().optional()),
 
   /** Optional error/event collector (see src/lib/telemetry.ts). */
-  TELEMETRY_URL: z.string().url().optional(),
+  TELEMETRY_URL: blankAsUndefined(z.string().url().optional()),
 
   /**
    * OAuth providers. Each is optional and registered only when both halves are
    * present, so the sign-in page can offer exactly what's configured instead
    * of showing a button that 500s.
    */
-  AUTH_GITHUB_ID: z.string().min(1).optional(),
-  AUTH_GITHUB_SECRET: z.string().min(1).optional(),
-  AUTH_GOOGLE_ID: z.string().min(1).optional(),
-  AUTH_GOOGLE_SECRET: z.string().min(1).optional(),
+  AUTH_GITHUB_ID: blankAsUndefined(z.string().min(1).optional()),
+  AUTH_GITHUB_SECRET: blankAsUndefined(z.string().min(1).optional()),
+  AUTH_GOOGLE_ID: blankAsUndefined(z.string().min(1).optional()),
+  AUTH_GOOGLE_SECRET: blankAsUndefined(z.string().min(1).optional()),
 });
 
 export type Env = z.infer<typeof schema>;
