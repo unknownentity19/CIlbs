@@ -1,0 +1,34 @@
+# Caddy reverse proxy for Cilbs on Windows.
+#
+# Caddy is used here rather than IIS because it gets a Let's Encrypt
+# certificate by itself and renews it forever — no URL Rewrite module, no ARR,
+# no win-acme scheduled task. Install it with `winget install CaddyServer.Caddy`
+# and run `caddy run --config Caddyfile` (or install it as a service with
+# `caddy add-package`/NSSM the same way as the app).
+#
+# Replace the domain, and make sure it already points at this VM's public IP:
+# the certificate is issued by proving control of that name over port 80.
+
+your-domain.com {
+	# Caddy sets X-Forwarded-Host and X-Forwarded-Proto automatically, which is
+	# what Auth.js reads to build OAuth callback URLs and to know the session
+	# cookie may be marked Secure. Without them, sign-in redirects to the wrong
+	# origin and the cookie is dropped.
+	reverse_proxy 127.0.0.1:3000
+
+	encode zstd gzip
+
+	# The app sets its own security headers (see next.config.ts and
+	# vercel.json); this is only the one that must be set by whatever
+	# terminates TLS.
+	header {
+		Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"
+	}
+
+	log {
+		output file C:/cilbs/logs/caddy.log {
+			roll_size 10mb
+			roll_keep 5
+		}
+	}
+}

@@ -6,9 +6,12 @@ import { Container, Section, SectionHeader } from "@/components/ui/section";
 import { Reveal, StaggerGroup, StaggerItem } from "@/components/motion/reveal";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { faqSchema, jsonLd } from "@/lib/structured-data";
 
 export const metadata: Metadata = {
-  title: "Pricing — Hypero",
+  // The root layout applies the `%s — Cilbs` template, so this is just
+  // the segment name — spelling out the suffix here rendered it twice.
+  title: "Pricing",
   description:
     "Simple pricing for every team. Start free, scale to Pro, and get bespoke support on Enterprise.",
 };
@@ -26,7 +29,7 @@ type Plan = {
 const PLANS: Plan[] = [
   {
     name: "Free",
-    description: "Everything you need to learn Hypero and ship a side project.",
+    description: "Everything you need to learn Cilbs and ship a side project.",
     price: "$0",
     cadence: "forever",
     cta: { label: "Start free", href: "/signup" },
@@ -125,7 +128,7 @@ const COMPARE_GROUPS = [
 const FAQ = [
   {
     q: "Can I use my own OpenAI / Anthropic key?",
-    a: "Yes. On Pro and Enterprise plans you can bring your own model keys. We'll route all model calls through your provider while still tracking usage in Hypero's observability layer.",
+    a: "Yes. On Pro and Enterprise plans you can bring your own model keys. We'll route all model calls through your provider while still tracking usage in Cilbs's observability layer.",
   },
   {
     q: "What counts as a run?",
@@ -136,8 +139,8 @@ const FAQ = [
     a: "The Free plan covers most prototyping use cases. If you'd like to evaluate Pro features (multiplayer, longer trace history, bring-your-own keys), reach out and we'll enable a 14-day trial on your workspace.",
   },
   {
-    q: "Can Hypero be self-hosted?",
-    a: "Yes — Enterprise customers can deploy Hypero into their own VPC or on-prem environment. We provide a Helm chart, Terraform modules, and an upgrade path.",
+    q: "Can Cilbs be self-hosted?",
+    a: "Yes — Enterprise customers can deploy Cilbs into their own VPC or on-prem environment. We provide a Helm chart, Terraform modules, and an upgrade path.",
   },
   {
     q: "Do you support educational or non-profit pricing?",
@@ -162,6 +165,13 @@ function FeatureCell({ value }: { value: boolean | string }) {
 export default function PricingPage() {
   return (
     <>
+      {/* The FAQ array below the fold is the source of truth; this mirrors it
+          into a rich result so the two can't drift apart. */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLd(faqSchema(FAQ)) }}
+      />
+
       {/* Hero */}
       <Section className="relative overflow-hidden pt-20 pb-12">
         <div className="absolute inset-0 -z-10 bg-grid bg-grid-fade" />
@@ -209,7 +219,15 @@ export default function PricingPage() {
             description="Every plan includes the visual canvas, AI agents, integrations, and the runtime. Limits and support are what change."
           />
           <Reveal delay={0.1} className="mt-12 overflow-hidden rounded-2xl border border-border bg-card">
-            <div className="overflow-x-auto">
+            {/* Focusable + labelled: the table is wider than a phone, and a
+                scrollable region with nothing focusable inside cannot be
+                scrolled from the keyboard. */}
+            <div
+              tabIndex={0}
+              role="region"
+              aria-label="Comparison table"
+              className="overflow-x-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20"
+            >
               <table className="w-full text-left">
                 <thead>
                   <tr className="bg-muted/40 text-xs uppercase tracking-wide text-muted-foreground">

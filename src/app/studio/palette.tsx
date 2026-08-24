@@ -35,12 +35,15 @@ export function Palette({
                   type="button"
                   draggable
                   onDragStart={(e) => {
-                    e.dataTransfer.setData("application/x-hypero-node", kind);
+                    e.dataTransfer.setData("application/x-cilbs-node", kind);
                     e.dataTransfer.effectAllowed = "copy";
                   }}
-                  onDoubleClick={() => onAdd(kind)}
+                  // Click adds; dragging places it where you drop it. A
+                  // double-click requirement is undiscoverable, and on touch
+                  // — where there is no drag-and-drop — it was the only way in.
+                  onClick={() => onAdd(kind)}
                   className="group flex items-start gap-2.5 rounded-lg border border-transparent px-2 py-2 text-left transition-colors hover:border-border hover:bg-accent active:cursor-grabbing"
-                  title="Drag to canvas, or double-click to add"
+                  title="Click to add, or drag onto the canvas"
                 >
                   <span className="mt-0.5 inline-flex h-7 w-7 flex-none items-center justify-center rounded-md border border-border bg-card text-foreground">
                     <NodeIcon kind={kind} />

@@ -22,11 +22,10 @@ function id() {
   return `id-${Math.random().toString(36).slice(2, 10)}-${Date.now().toString(36)}`;
 }
 
-function build(
-  name: string,
-  specs: Spec[],
-  pairs: [string, string][],
-): Workflow {
+/** [from, to, branch?] — the branch only matters when `from` is a condition. */
+type Pair = [string, string, ("true" | "false")?];
+
+function build(name: string, specs: Spec[], pairs: Pair[]): Workflow {
   const idByKey = new Map<string, string>();
   const nodes: WorkflowNode[] = specs.map((s) => {
     const nid = id();
@@ -42,11 +41,13 @@ function build(
     };
   });
   const edges: Edge[] = pairs
-    .map(([from, to]) => {
+    .map(([from, to, branch]) => {
       const f = idByKey.get(from);
       const t = idByKey.get(to);
       if (!f || !t) return null;
-      return { id: id(), from: f, to: t };
+      const edge: Edge = { id: id(), from: f, to: t };
+      if (branch) edge.branch = branch;
+      return edge;
     })
     .filter((e): e is Edge => e !== null);
   return { id: id(), name, nodes, edges };
@@ -124,8 +125,8 @@ export const TEMPLATES: TemplateMeta[] = [
         [
           ["t", "a"],
           ["a", "c"],
-          ["c", "s"],
-          ["c", "p"],
+          ["c", "s", "true"],
+          ["c", "p", "false"],
         ],
       ),
   },
@@ -164,7 +165,7 @@ export const TEMPLATES: TemplateMeta[] = [
             x: 560,
             y: 112,
             config: {
-              model: "claude-3.5-sonnet",
+              model: "claude-opus-5",
               instructions:
                 "Draft a polite, accurate reply with citations.",
               tools: ["search"],
@@ -186,6 +187,87 @@ export const TEMPLATES: TemplateMeta[] = [
           ["t", "h"],
           ["h", "a"],
           ["a", "n"],
+        ],
+      ),
+  },
+  {
+    id: "churn-watch",
+    name: "Churn watch",
+    description:
+      "Nightly SQL → agent scores risk → high risk pages sales, the rest is logged.",
+    build: () =>
+      build(
+        "Churn watch",
+        [
+          {
+            key: "t",
+            kind: "schedule",
+            label: "Nightly at 02:00",
+            x: 32,
+            y: 112,
+            config: { cron: "0 2 * * *" },
+          },
+          {
+            key: "q",
+            kind: "postgres",
+            label: "Accounts at risk",
+            x: 296,
+            y: 112,
+            config: {
+              query:
+                "SELECT id, name, last_seen_at FROM accounts WHERE last_seen_at < now() - interval \'21 days\';",
+            },
+          },
+          {
+            key: "a",
+            kind: "agent",
+            label: "Score churn risk",
+            x: 560,
+            y: 112,
+            config: {
+              model: "claude-sonnet-5",
+              instructions:
+                "Score each account\'s churn risk from 0-100 and draft a one-line reason a CSM can act on.",
+              tools: ["search"],
+            },
+          },
+          {
+            key: "c",
+            kind: "condition",
+            label: "Risk over 70?",
+            x: 824,
+            y: 112,
+            config: { expression: "$.risk > 70" },
+          },
+          {
+            key: "s",
+            kind: "slack",
+            label: "Page the CSM",
+            x: 1088,
+            y: 32,
+            config: {
+              channel: "#customer-success",
+              message: "⚠️ {{ input.name }} is trending to churn — {{ input.reason }}",
+            },
+          },
+          {
+            key: "n",
+            kind: "notion",
+            label: "Log to Notion",
+            x: 1088,
+            y: 192,
+            config: {
+              database: "Accounts",
+              properties: '{ "Reviewed": "Yes" }',
+            },
+          },
+        ],
+        [
+          ["t", "q"],
+          ["q", "a"],
+          ["a", "c"],
+          ["c", "s", "true"],
+          ["c", "n", "false"],
         ],
       ),
   },

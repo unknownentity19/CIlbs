@@ -6,9 +6,11 @@ import { CodeBlock } from "@/components/docs/code-block";
 import { Badge } from "@/components/ui/badge";
 
 export const metadata: Metadata = {
-  title: "Docs — Hypero",
+  // The root layout applies the `%s — Cilbs` template, so this is just
+  // the segment name — spelling out the suffix here rendered it twice.
+  title: "Docs",
   description:
-    "Learn how to build with Hypero. Getting started, authentication, workflows, AI agents, the API, and webhooks.",
+    "Learn how to build with Cilbs. Getting started, authentication, workflows, AI agents, the API, and webhooks.",
 };
 
 const SECTIONS: DocSection[] = [
@@ -56,7 +58,7 @@ export default function DocsPage() {
                 </span>
               </div>
               <h1 className="mt-4 text-4xl sm:text-5xl font-semibold tracking-tight leading-tight">
-                Build with Hypero.
+                Build with Cilbs.
               </h1>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed max-w-2xl">
                 Everything you need to design, deploy, and operate intelligent
@@ -67,20 +69,20 @@ export default function DocsPage() {
             <div className="mt-14 flex flex-col gap-16">
               <DocBlock id="introduction" title="Introduction">
                 <p>
-                  Hypero is a visual builder for AI workflows. You compose
+                  Cilbs is a visual builder for AI workflows. You compose
                   triggers, agents, integrations, and logic on a single canvas,
-                  and Hypero turns it into a production-ready service with an
+                  and Cilbs turns it into a production-ready service with an
                   authenticated API endpoint, observability, and version
                   control.
                 </p>
                 <p>
-                  This guide assumes you have a Hypero account and a workspace.
+                  This guide assumes you have a Cilbs account and a workspace.
                   If you don&apos;t, sign up at{" "}
                   <a
                     href="/pricing"
                     className="text-foreground underline-offset-4 hover:underline"
                   >
-                    hypero.dev
+                    cilbs.com
                   </a>{" "}
                   — the free tier is enough to follow along.
                 </p>
@@ -92,8 +94,8 @@ export default function DocsPage() {
                   workspace.
                 </p>
                 <CodeBlock language="bash">
-                  {`# Install the Hypero CLI
-npm install -g @hypero/cli
+                  {`# Install the Cilbs CLI
+npm install -g @cilbs/cli
 
 # Authenticate
 hyp login
@@ -108,7 +110,7 @@ cd lead-router && hyp deploy`}
                   After <code className="font-mono text-foreground">hyp deploy</code>, your
                   workflow is live at{" "}
                   <code className="font-mono text-foreground">
-                    https://api.hypero.dev/v1/workflows/lead-router/run
+                    https://api.cilbs.com/v1/workflows/lead-router/run
                   </code>
                   .
                 </p>
@@ -116,7 +118,7 @@ cd lead-router && hyp deploy`}
 
               <DocBlock id="concepts" title="Core concepts">
                 <p>
-                  Three primitives power Hypero: <strong>workflows</strong>,{" "}
+                  Three primitives power Cilbs: <strong>workflows</strong>,{" "}
                   <strong>nodes</strong>, and <strong>agents</strong>.
                 </p>
                 <ul>
@@ -140,7 +142,7 @@ cd lead-router && hyp deploy`}
 
               <DocBlock id="authentication" title="Authentication">
                 <p>
-                  Hypero uses bearer tokens. Each workspace exposes one or more
+                  Cilbs uses bearer tokens. Each workspace exposes one or more
                   API keys with scopes. Generate keys from{" "}
                   <code className="font-mono text-foreground">
                     Settings → API keys
@@ -148,13 +150,13 @@ cd lead-router && hyp deploy`}
                   .
                 </p>
                 <CodeBlock language="bash">
-                  {`curl https://api.hypero.dev/v1/whoami \\
-  -H "Authorization: Bearer $HYPERO_API_KEY"`}
+                  {`curl https://api.cilbs.com/v1/whoami \\
+  -H "Authorization: Bearer $CILBS_API_KEY"`}
                 </CodeBlock>
                 <p>
                   All endpoints expect <code className="font-mono">Authorization: Bearer …</code>{" "}
                   unless explicitly marked public. Webhook signatures are validated separately
-                  via the <code className="font-mono">X-Hypero-Signature</code> header.
+                  via the <code className="font-mono">X-Cilbs-Signature</code> header.
                 </p>
               </DocBlock>
 
@@ -268,16 +270,16 @@ guardrails:
                   </table>
                 </div>
                 <CodeBlock language="bash">
-                  {`curl https://api.hypero.dev/v1/workflows/lead-router/run \\
-  -H "Authorization: Bearer $HYPERO_API_KEY" \\
+                  {`curl https://api.cilbs.com/v1/workflows/lead-router/run \\
+  -H "Authorization: Bearer $CILBS_API_KEY" \\
   -H "Content-Type: application/json" \\
-  -d '{ "email": "ada@hypero.dev" }'`}
+  -d '{ "email": "ada@cilbs.com" }'`}
                 </CodeBlock>
               </DocBlock>
 
               <DocBlock id="webhooks" title="Webhooks">
                 <p>
-                  Hypero sends webhooks for run lifecycle events. You can use
+                  Cilbs sends webhooks for run lifecycle events. You can use
                   these to keep external systems in sync, or to trigger
                   downstream workflows.
                 </p>
@@ -301,7 +303,7 @@ guardrails:
                 </ul>
                 <p>
                   Verify webhooks with the{" "}
-                  <code className="font-mono">X-Hypero-Signature</code> header,
+                  <code className="font-mono">X-Cilbs-Signature</code> header,
                   which contains an HMAC-SHA256 of the raw body using your
                   endpoint&apos;s signing secret.
                 </p>

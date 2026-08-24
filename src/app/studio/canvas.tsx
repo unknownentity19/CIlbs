@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import {
   Maximize2,
   Minus,
@@ -31,11 +31,15 @@ import {
  * dropping from the palette all feel consistent at any zoom level.
  *
  * Controls:
- *   - Drag empty space → pan
+ *   - Drag empty space → pan (one finger on touch)
+ *   - Two fingers       → pinch zoom
  *   - Wheel             → pan (trackpad two-finger)
  *   - Ctrl/Cmd + wheel  → zoom around cursor
- *   - +, −, 100%, fit   → toolbar buttons
+ *   - Ctrl/Cmd + / −    → zoom, Ctrl/Cmd + 0 → 100%
+ *   - F                 → fit graph to view
+ *   - Arrows            → nudge selection by one grid step (⇧ = ×4)
  *   - Backspace         → delete selected node
+ *   - Escape            → cancel a half-drawn edge, then deselect
  */
 
 const CATEGORY_TONE: Record<string, string> = {
@@ -48,6 +52,8 @@ const CATEGORY_TONE: Record<string, string> = {
 
 const MIN_SCALE = 0.25;
 const MAX_SCALE = 2.5;
+/** Floor for "fit to view" only; manual zoom can still go to MIN_SCALE. */
+const FIT_MIN_SCALE = 0.5;
 const PAN_DRAG_THRESHOLD = 4;
 
 type Viewport = { x: number; y: number; scale: number };
@@ -58,15 +64,28 @@ export type CanvasProps = {
   draftEdge: { fromId: string; x: number; y: number } | null;
   runningNodeId: string | null;
   finishedNodeIds: Set<string>;
+  /** Nodes the runner walked past because their branch wasn't taken. */
+  skippedNodeIds: Set<string>;
   onSelectNode: (id: string | null) => void;
   onMoveNode: (id: string, x: number, y: number) => void;
   onDeleteNode: (id: string) => void;
   onDeleteEdge: (id: string) => void;
+  /** Flip which side of a condition an edge carries. */
+  onSetEdgeBranch: (id: string, branch: "true" | "false") => void;
   onStartConnect: (id: string, worldX: number, worldY: number) => void;
   onUpdateDraft: (worldX: number, worldY: number) => void;
   onCompleteConnect: (toId: string | null) => void;
   /** Called when a palette item is dropped onto the canvas. World coords. */
   onAddNode: (kind: NodeKind, worldX: number, worldY: number) => void;
+  /** Reports the world point at the middle of the viewport, so the parent can
+   * drop click-added nodes where the user is actually looking. */
+  onViewportChange?: (center: { x: number; y: number }) => void;
+  /**
+   * Bumped by the parent whenever the graph should be re-framed (first load,
+   * loading a template, tidying, importing). The value itself is meaningless —
+   * only the change matters.
+   */
+  fitSignal: number;
 };
 
 function snap(v: number) {
@@ -84,9 +103,34 @@ function port(node: WorkflowNode, side: "left" | "right") {
   };
 }
 
+function edgeControl(x1: number, y1: number, x2: number) {
+  return Math.max(40, Math.abs(x2 - x1) * 0.5);
+}
+
 function edgePath(x1: number, y1: number, x2: number, y2: number) {
-  const dx = Math.max(40, Math.abs(x2 - x1) * 0.5);
+  const dx = edgeControl(x1, y1, x2);
   return `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`;
+}
+
+/** Point at `t` along the same cubic, so labels sit *on* the curve rather
+ * than on the straight line between the two ports. */
+function pointOnEdge(
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number,
+  t: number,
+) {
+  const dx = edgeControl(x1, y1, x2);
+  const mt = 1 - t;
+  const a = mt * mt * mt;
+  const b = 3 * mt * mt * t;
+  const c = 3 * mt * t * t;
+  const d = t * t * t;
+  return {
+    x: a * x1 + b * (x1 + dx) + c * (x2 - dx) + d * x2,
+    y: a * y1 + b * y1 + c * y2 + d * y2,
+  };
 }
 
 export function Canvas({
@@ -95,28 +139,38 @@ export function Canvas({
   draftEdge,
   runningNodeId,
   finishedNodeIds,
+  skippedNodeIds,
   onSelectNode,
   onMoveNode,
   onDeleteNode,
   onDeleteEdge,
+  onSetEdgeBranch,
   onStartConnect,
   onUpdateDraft,
   onCompleteConnect,
   onAddNode,
+  onViewportChange,
+  fitSignal,
 }: CanvasProps) {
   const containerRef = React.useRef<HTMLDivElement | null>(null);
+  // Edge whose controls (delete, branch toggle) are revealed. Hovering sets it
+  // on pointer devices; tapping sets it on touch, where there is no hover.
+  const [activeEdgeId, setActiveEdgeId] = React.useState<string | null>(null);
   const [viewport, setViewport] = React.useState<Viewport>({
     x: 0,
     y: 0,
     scale: 1,
   });
-  // Always-current mirror of `viewport`. The native touch listeners are bound
-  // once (empty deps) and must read the live viewport *synchronously* inside
-  // touchstart — reading it via a `setViewport` updater defers the read to
-  // React's commit phase, and on real phones touchmove can fire first, which
-  // dropped the whole gesture. A ref sidesteps that race.
+  // Always-current mirror of `viewport`. Gesture handlers need to read the live
+  // viewport *synchronously* on pointerdown — reading it through a
+  // `setViewport` updater defers the read to React's commit phase, and on real
+  // phones a move event can land first, which dropped the whole gesture.
+  // Written from an effect (never during render) so React can safely discard
+  // and replay a render without the ref drifting out of sync.
   const viewportRef = React.useRef(viewport);
-  viewportRef.current = viewport;
+  React.useEffect(() => {
+    viewportRef.current = viewport;
+  }, [viewport]);
 
   // Active gesture state. Refs are the right tool here — the gesture is a
   // mouse-driven side effect, not React-rendered state.
@@ -132,6 +186,11 @@ export function Canvas({
     startVy: number;
     moved: boolean;
   } | null>(null);
+  // Mirrors `panRef.current.moved` for rendering. The cursor used to be read
+  // straight off the ref, which React never re-renders for — the grabbing
+  // cursor only appeared because panning happened to update the viewport in
+  // the same frame.
+  const [panning, setPanning] = React.useState(false);
   // Carries the "did this gesture pan?" flag from pointerup to the trailing
   // click, since panRef is already cleared by the time click fires.
   const panMovedRef = React.useRef(false);
@@ -163,6 +222,17 @@ export function Canvas({
     },
     [viewport.x, viewport.y, viewport.scale],
   );
+
+  // Publish the viewport centre (in world coords) whenever it moves.
+  React.useEffect(() => {
+    if (!onViewportChange) return;
+    const rect = containerRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    onViewportChange({
+      x: (rect.width / 2 - viewport.x) / viewport.scale,
+      y: (rect.height / 2 - viewport.y) / viewport.scale,
+    });
+  }, [viewport, onViewportChange]);
 
   // ----- Wheel handling --------------------------------------------------
   // We attach via ref + addEventListener so we can call preventDefault on
@@ -217,6 +287,8 @@ export function Canvas({
     // toolbar / edge-delete buttons), which handle their own taps.
     const target = e.target as HTMLElement | null;
     if (target?.closest("button")) return;
+    // Pressing anywhere that isn't an edge dismisses that edge's controls.
+    if (!target?.closest("[data-edge-id]")) setActiveEdgeId(null);
     // Register the pointer and arm the gesture FIRST, before anything that can
     // throw. setPointerCapture is best-effort: on some real mobile browsers it
     // can throw (e.g. NotFoundError for a pointer the engine considers stale)
@@ -286,6 +358,7 @@ export function Canvas({
       const dy = e.clientY - panRef.current.startClientY;
       if (!panRef.current.moved && Math.hypot(dx, dy) > PAN_DRAG_THRESHOLD) {
         panRef.current.moved = true;
+        setPanning(true);
       }
       if (panRef.current.moved) {
         setViewport((vp) => ({
@@ -312,6 +385,7 @@ export function Canvas({
       // pan apart from a tap-to-deselect.
       panMovedRef.current = panRef.current?.moved ?? false;
       panRef.current = null;
+      setPanning(false);
     } else if (remaining === 1) {
       // Lifted from a two-finger pinch back to one finger: resume panning from
       // the finger that's still down so the view doesn't jump.
@@ -341,14 +415,14 @@ export function Canvas({
 
   // Drag-and-drop from the palette.
   const onDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    if (e.dataTransfer.types.includes("application/x-hypero-node")) {
+    if (e.dataTransfer.types.includes("application/x-cilbs-node")) {
       e.preventDefault();
       e.dataTransfer.dropEffect = "copy";
     }
   };
   const onDrop = (e: React.DragEvent<HTMLDivElement>) => {
     const kind = e.dataTransfer.getData(
-      "application/x-hypero-node",
+      "application/x-cilbs-node",
     ) as NodeKind | "";
     if (!kind) return;
     e.preventDefault();
@@ -357,30 +431,8 @@ export function Canvas({
     onAddNode(kind, snap(x - NODE_W / 2), snap(y - NODE_H / 2));
   };
 
-  // Keyboard delete for selected node.
-  React.useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      if (!selectedId) return;
-      const target = e.target as HTMLElement | null;
-      if (
-        target &&
-        (target.tagName === "INPUT" ||
-          target.tagName === "TEXTAREA" ||
-          target.isContentEditable)
-      ) {
-        return;
-      }
-      if (e.key === "Delete" || e.key === "Backspace") {
-        e.preventDefault();
-        onDeleteNode(selectedId);
-      }
-    }
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [selectedId, onDeleteNode]);
-
   // ----- Toolbar actions -------------------------------------------------
-  const zoomBy = (factor: number) => {
+  const zoomBy = React.useCallback((factor: number) => {
     const node = containerRef.current;
     if (!node) return;
     const rect = node.getBoundingClientRect();
@@ -396,11 +448,14 @@ export function Canvas({
         scale: nextScale,
       };
     });
-  };
+  }, []);
 
-  const resetZoom = () => setViewport({ x: 0, y: 0, scale: 1 });
+  const resetZoom = React.useCallback(
+    () => setViewport({ x: 0, y: 0, scale: 1 }),
+    [],
+  );
 
-  const fitToView = () => {
+  const fitToView = React.useCallback(() => {
     const node = containerRef.current;
     if (!node) return;
     if (workflow.nodes.length === 0) {
@@ -417,15 +472,114 @@ export function Canvas({
     const rect = node.getBoundingClientRect();
     const availW = rect.width - padding * 2;
     const availH = rect.height - padding * 2;
+    // Never zoom out past the point where labels stop being readable — on a
+    // phone, fitting a wide graph edge-to-edge produces a 25% strip nobody can
+    // use. Panning a slightly cropped graph is the better trade.
     const scale = clamp(
       Math.min(availW / w, availH / h, 1),
-      MIN_SCALE,
+      FIT_MIN_SCALE,
       MAX_SCALE,
     );
     const x = (rect.width - w * scale) / 2 - minX * scale;
     const y = (rect.height - h * scale) / 2 - minY * scale;
     setViewport({ x, y, scale });
-  };
+  }, [workflow.nodes, resetZoom]);
+
+  // Re-frame the graph when the parent asks. `fitToView` changes identity every
+  // time a node moves, so the effect also depends on it — the guard below is
+  // what keeps a re-frame tied to a *new* signal instead of firing mid-drag.
+  // One animation frame of delay lets new nodes land in the DOM first, so the
+  // measured bounds are real.
+  const lastFitRef = React.useRef(0);
+  React.useEffect(() => {
+    if (fitSignal === 0 || lastFitRef.current === fitSignal) return;
+    lastFitRef.current = fitSignal;
+    const raf = requestAnimationFrame(() => fitToView());
+    return () => cancelAnimationFrame(raf);
+  }, [fitSignal, fitToView]);
+
+  // ----- Canvas keyboard shortcuts ---------------------------------------
+  // Everything here needs canvas-local state (viewport, selection geometry).
+  // Document-level editor shortcuts — undo, duplicate, run — live in the page.
+  React.useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      const target = e.target as HTMLElement | null;
+      const typing =
+        !!target &&
+        (target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.isContentEditable);
+      if (typing) return;
+
+      const mod = e.metaKey || e.ctrlKey;
+
+      if (mod && (e.key === "=" || e.key === "+")) {
+        e.preventDefault();
+        zoomBy(1.25);
+        return;
+      }
+      if (mod && e.key === "-") {
+        e.preventDefault();
+        zoomBy(0.8);
+        return;
+      }
+      if (mod && e.key === "0") {
+        e.preventDefault();
+        setViewport({ x: 0, y: 0, scale: 1 });
+        return;
+      }
+      if (!mod && (e.key === "f" || e.key === "F")) {
+        e.preventDefault();
+        fitToView();
+        return;
+      }
+      if (e.key === "Escape") {
+        // A half-drawn edge is the more recent intent, so it wins; a second
+        // Escape then clears the selection.
+        if (draftEdge) {
+          onCompleteConnect(null);
+        } else {
+          onSelectNode(null);
+        }
+        return;
+      }
+
+      if (!selectedId) return;
+
+      if (e.key === "Delete" || e.key === "Backspace") {
+        e.preventDefault();
+        onDeleteNode(selectedId);
+        return;
+      }
+
+      const nudge: Record<string, [number, number]> = {
+        ArrowLeft: [-1, 0],
+        ArrowRight: [1, 0],
+        ArrowUp: [0, -1],
+        ArrowDown: [0, 1],
+      };
+      const delta = nudge[e.key];
+      if (delta) {
+        e.preventDefault();
+        const node = workflow.nodes.find((n) => n.id === selectedId);
+        if (!node) return;
+        const step = GRID * (e.shiftKey ? 4 : 1);
+        onMoveNode(node.id, node.x + delta[0] * step, node.y + delta[1] * step);
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [
+    selectedId,
+    draftEdge,
+    workflow.nodes,
+    zoomBy,
+    fitToView,
+    onDeleteNode,
+    onMoveNode,
+    onSelectNode,
+    onCompleteConnect,
+  ]);
 
   // ----- Render ----------------------------------------------------------
   // The dotted-grid background pans and scales with the viewport so the
@@ -455,7 +609,7 @@ export function Canvas({
         // pinch) to our own handlers. Without it the browser claims them for
         // page scroll / pinch-zoom and the canvas feels unresponsive on phones.
         "relative h-full w-full touch-none overflow-hidden rounded-xl border border-border bg-card",
-        panRef.current?.moved ? "cursor-grabbing" : "cursor-grab",
+        panning ? "cursor-grabbing" : "cursor-grab",
       )}
       role="region"
       aria-label="Workflow canvas"
@@ -507,7 +661,16 @@ export function Canvas({
                 !!runningNodeId &&
                 (edge.from === runningNodeId || edge.to === runningNodeId)
               }
-              onDelete={() => onDeleteEdge(edge.id)}
+              active={activeEdgeId === edge.id}
+              onActivate={() => setActiveEdgeId(edge.id)}
+              onDeactivate={() =>
+                setActiveEdgeId((id) => (id === edge.id ? null : id))
+              }
+              onDelete={() => {
+                setActiveEdgeId(null);
+                onDeleteEdge(edge.id);
+              }}
+              onSetBranch={(branch) => onSetEdgeBranch(edge.id, branch)}
             />
           ))}
           {draftEdge ? (
@@ -531,6 +694,7 @@ export function Canvas({
               selected={selectedId === node.id}
               running={runningNodeId === node.id}
               done={finishedNodeIds.has(node.id)}
+              skipped={skippedNodeIds.has(node.id)}
               onSelect={() => onSelectNode(node.id)}
               onPointerDown={(e) => {
                 // Pointer Events unify mouse, touch and pen, so node dragging
@@ -595,10 +759,10 @@ export function Canvas({
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
           <div className="rounded-xl border border-dashed border-border bg-background/60 px-6 py-5 text-center backdrop-blur">
             <p className="text-sm font-medium text-foreground">
-              Drag a node from the palette
+              Add a node from the palette
             </p>
             <p className="mt-1 text-xs text-muted-foreground">
-              Or load a template above to get started.
+              Click one to drop it here, or load a template to get started.
             </p>
           </div>
         </div>
@@ -651,7 +815,9 @@ export function Canvas({
       {/* Hints */}
       <div className="pointer-events-none absolute bottom-3 left-3 hidden items-center gap-2 rounded-full border border-border bg-card/80 px-2.5 py-1 text-[10px] text-muted-foreground backdrop-blur md:inline-flex">
         <MousePointer2 className="h-3 w-3" />
-        <span>drag empty space to pan · ⌘ + scroll to zoom</span>
+        <span>
+          drag to pan · ⌘ + scroll to zoom · F to fit · ? for shortcuts
+        </span>
       </div>
     </div>
   );
@@ -683,32 +849,68 @@ function EdgeView({
   edge,
   workflow,
   isLive,
+  active,
+  onActivate,
+  onDeactivate,
   onDelete,
+  onSetBranch,
 }: {
   edge: Edge;
   workflow: Workflow;
   isLive: boolean;
+  active: boolean;
+  onActivate: () => void;
+  onDeactivate: () => void;
   onDelete: () => void;
+  onSetBranch: (branch: "true" | "false") => void;
 }) {
+  // Hooks must run before any early return.
+  const reduceMotion = useReducedMotion();
   const from = workflow.nodes.find((n) => n.id === edge.from);
   const to = workflow.nodes.find((n) => n.id === edge.to);
   if (!from || !to) return null;
   const a = port(from, "right");
   const b = port(to, "left");
   const d = edgePath(a.x, a.y, b.x, b.y);
-  const midX = (a.x + b.x) / 2;
-  const midY = (a.y + b.y) / 2;
+  const mid = pointOnEdge(a.x, a.y, b.x, b.y, 0.5);
+  // Edges leaving a condition carry a branch, shown as a pill near the source
+  // so a two-way condition is readable at a glance.
+  const isBranch = from.kind === "condition";
+  const branch = edge.branch ?? "true";
+  const branchAt = pointOnEdge(a.x, a.y, b.x, b.y, 0.26);
+
   return (
-    <g className="pointer-events-auto">
-      <path d={d} stroke="transparent" strokeWidth={14} fill="none" />
+    <g
+      data-edge-id={edge.id}
+      className="pointer-events-auto"
+      onPointerEnter={onActivate}
+      onPointerLeave={onDeactivate}
+    >
+      {/* Fat invisible path: the real hit target, since a 1.6px line is
+          impossible to hover precisely (and untouchable on a phone). */}
       <path
         d={d}
-        stroke="rgb(var(--border-strong))"
-        strokeWidth={1.6}
+        stroke="transparent"
+        strokeWidth={16}
+        fill="none"
+        onPointerDown={onActivate}
+      />
+      <path
+        d={d}
+        stroke={
+          active
+            ? "rgb(var(--foreground) / 0.75)"
+            : isBranch && branch === "false"
+              ? "rgb(var(--border-strong) / 0.7)"
+              : "rgb(var(--border-strong))"
+        }
+        strokeWidth={active ? 2.2 : 1.6}
+        strokeDasharray={isBranch && branch === "false" ? "6 4" : undefined}
         fill="none"
         markerEnd="url(#arrow)"
+        style={{ transition: "stroke-width 120ms ease-out" }}
       />
-      {isLive ? (
+      {isLive && !reduceMotion ? (
         <motion.circle
           r={3.5}
           fill="rgb(var(--gradient-via))"
@@ -719,22 +921,50 @@ function EdgeView({
           style={{ offsetPath: `path("${d}")` }}
         />
       ) : null}
-      <foreignObject
-        x={midX - 10}
-        y={midY - 10}
-        width={20}
-        height={20}
-        className="pointer-events-auto"
-      >
-        <button
-          type="button"
-          onClick={onDelete}
-          aria-label="Delete edge"
-          className="flex h-5 w-5 items-center justify-center rounded-full border border-border bg-background text-muted-foreground hover:text-foreground"
+
+      {isBranch ? (
+        <foreignObject
+          x={branchAt.x - 26}
+          y={branchAt.y - 11}
+          width={52}
+          height={22}
         >
-          <X className="h-3 w-3" />
-        </button>
-      </foreignObject>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onSetBranch(branch === "true" ? "false" : "true");
+            }}
+            title="Toggle which branch this edge follows"
+            className={cn(
+              "flex h-[22px] w-[52px] items-center justify-center rounded-full border text-[10px] font-medium transition-colors",
+              branch === "true"
+                ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
+                : "border-border bg-background text-muted-foreground",
+            )}
+          >
+            {branch}
+          </button>
+        </foreignObject>
+      ) : null}
+
+      {/* Delete control only while the edge is hovered or tapped — otherwise
+          a busy graph is peppered with X buttons. */}
+      {active ? (
+        <foreignObject x={mid.x - 10} y={mid.y - 10} width={20} height={20}>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete();
+            }}
+            aria-label="Delete edge"
+            className="flex h-5 w-5 items-center justify-center rounded-full border border-border bg-background text-muted-foreground shadow-sm hover:border-foreground hover:text-foreground"
+          >
+            <X className="h-3 w-3" />
+          </button>
+        </foreignObject>
+      ) : null}
     </g>
   );
 }
@@ -770,6 +1000,7 @@ function NodeView({
   selected,
   running,
   done,
+  skipped,
   onSelect,
   onPointerDown,
   onPointerMove,
@@ -782,6 +1013,7 @@ function NodeView({
   selected: boolean;
   running: boolean;
   done: boolean;
+  skipped: boolean;
   onSelect: () => void;
   onPointerDown: (e: React.PointerEvent) => void;
   onPointerMove: (e: React.PointerEvent) => void;
@@ -793,6 +1025,8 @@ function NodeView({
   const category = NODE_CATEGORY[node.kind];
   const tone = CATEGORY_TONE[category] ?? CATEGORY_TONE.action;
   const meta = NODE_META[node.kind];
+  const reduceMotion = useReducedMotion();
+  const badgeTransition = { duration: reduceMotion ? 0 : 0.18 };
 
   // Drag feel: position the node with `transform: translate3d` rather than
   // `left/top` so the browser can promote it to its own compositor layer
@@ -829,11 +1063,18 @@ function NodeView({
       className={cn(
         "absolute left-0 top-0 cursor-grab select-none rounded-xl border bg-card",
         tone,
+        // A skipped node is still part of the graph, just not part of this
+        // run — fade it rather than hiding it.
+        skipped && "opacity-55",
       )}
-      role="button"
+      // `group`, not `button`: the card holds its own focusable control (the
+      // output port), and a widget role with focusable descendants is a real
+      // problem for screen-reader users — axe flags it as nested-interactive.
+      // It stays focusable so the keyboard shortcuts (delete, nudge) work.
+      role="group"
       tabIndex={0}
       aria-label={`${meta.label} node: ${node.label}`}
-      aria-pressed={selected}
+      aria-current={selected ? "true" : undefined}
     >
       <div className="flex h-full items-center gap-3 px-3">
         <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-border bg-background/80 text-foreground backdrop-blur">
@@ -849,6 +1090,7 @@ function NodeView({
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
+                  transition={badgeTransition}
                   className="inline-flex items-center gap-1 rounded-full bg-foreground/10 px-1.5 py-0.5 text-[9px] text-foreground"
                 >
                   <span className="h-1 w-1 animate-pulse rounded-full bg-emerald-500" />
@@ -860,9 +1102,21 @@ function NodeView({
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
+                  transition={badgeTransition}
                   className="rounded-full bg-emerald-500/15 px-1.5 py-0.5 text-[9px] text-emerald-700 dark:text-emerald-400"
                 >
                   ok
+                </motion.span>
+              ) : skipped ? (
+                <motion.span
+                  key="skipped"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={badgeTransition}
+                  className="rounded-full bg-muted px-1.5 py-0.5 text-[9px] text-muted-foreground"
+                >
+                  skipped
                 </motion.span>
               ) : null}
             </AnimatePresence>

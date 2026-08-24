@@ -16,10 +16,13 @@ const TEXT_SIZES: Record<Size, string> = {
 };
 
 /**
- * Hypero logomark. We use the SVG provided (`/public/logo.svg`)
- * for crisp rendering at any size. `next/image` handles sizing,
- * the file is served from the public folder so it can be cached on the
- * edge without further config.
+ * Cilbs logomark.
+ *
+ * The artwork is a raster master (`brand/logo-master.webp`) rather than a
+ * path: it's built from overlapping translucent shapes with gradients, and
+ * tracing that to SVG would throw away exactly the blending that makes it look
+ * like itself. Every size ships from that one master — see
+ * `scripts/generate-brand-assets.mjs`.
  */
 export function LogoMark({
   className,
@@ -31,19 +34,15 @@ export function LogoMark({
   const { className: sizeClass, pixels } = MARK_SIZES[size];
   return (
     <Image
-      src="/logo.svg"
+      src="/logo-512.png"
       width={pixels}
       height={pixels}
       alt=""
       aria-hidden
       priority
       draggable={false}
-      // Deter casual saving/dragging of the mark: `pointer-events-none`
-      // means a right-click targets the surrounding element (no "Save image"
-      // entry) and the image can't be dragged out, while link clicks still
-      // pass through. `select-none` + `-webkit-user-drag` cover the rest.
       className={cn(
-        "shrink-0 object-contain pointer-events-none select-none [-webkit-user-drag:none]",
+        "shrink-0 object-contain select-none [-webkit-user-drag:none]",
         sizeClass,
         className,
       )}
@@ -52,7 +51,7 @@ export function LogoMark({
 }
 
 /**
- * Full Hypero lockup — logomark + uppercase wordmark.
+ * Full Cilbs lockup — logomark + uppercase wordmark.
  */
 export function Logo({
   className,
@@ -62,7 +61,9 @@ export function Logo({
   size?: Size;
 }) {
   return (
-    <span className={cn("inline-flex items-center gap-2.5 select-none", className)}>
+    <span
+      className={cn("inline-flex items-center gap-2.5 select-none", className)}
+    >
       <LogoMark size={size} />
       <span
         className={cn(
@@ -70,7 +71,7 @@ export function Logo({
           TEXT_SIZES[size],
         )}
       >
-        Hypero
+        Cilbs
       </span>
     </span>
   );

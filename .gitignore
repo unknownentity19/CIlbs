@@ -32,6 +32,8 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# ...but the template of required variables belongs in the repo.
+!.env.example
 
 # vercel
 .vercel
@@ -39,3 +41,15 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# tests + local env
+/test-results
+/playwright-report
+/playwright/.cache
+.env.local
+.env*.local
+
+# local throwaway database (scripts/dev-postgres.mjs)
+/.postgres
+# saved Playwright session
+e2e/.auth

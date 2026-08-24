@@ -6,7 +6,9 @@
   --background: 255 255 255;
   --foreground: 9 9 11;
   --muted: 250 250 252;
-  --muted-foreground: 113 113 122;
+  /* 98 98 107 rather than 113 113 122: the lighter value measured 4.43:1 on
+     the accent surface, a hair under the 4.5:1 WCAG AA floor for body text. */
+  --muted-foreground: 98 98 107;
   --border: 228 228 231;
   --border-strong: 212 212 216;
   --card: 255 255 255;
@@ -256,6 +258,9 @@ body {
 .reveal.is-visible {
   opacity: 1;
   transform: none;
+  /* Release the compositor hint once the element has settled — a page with
+     dozens of reveals would otherwise hold dozens of layers forever. */
+  will-change: auto;
 }
 
 /* One-shot entrance used by hero floaters and the workflow preview nodes. */
@@ -292,6 +297,25 @@ body {
   animation: dialog-in 0.18s ease-out;
 }
 
+/* Slow opacity breathe for "in progress" lines in the feature mocks. Replaces
+ * a framer-motion keyframe loop so those pages ship no animation runtime. */
+@keyframes soft-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+.animate-soft-pulse {
+  animation: soft-pulse 1.6s ease-in-out infinite;
+}
+
+/* Docs scroll-spy indicator. Position comes from measured inline styles; the
+ * transition is what makes it slide between sections. */
+.docs-rule {
+  top: 0;
+  transition:
+    transform 0.22s cubic-bezier(0.21, 0.47, 0.32, 0.98),
+    height 0.22s cubic-bezier(0.21, 0.47, 0.32, 0.98);
+}
+
 /* Pulse dots that travel along the workflow-preview edges. Each edge sets
  * its own `offset-path` and `animation-delay` inline; this drives motion
  * along that path with the CSS Motion Path API — no JS required. */
@@ -325,9 +349,20 @@ body {
   .animate-overlay-in,
   .animate-dialog-in,
   .animate-edge-pulse,
+  .animate-soft-pulse,
   .animate-grid,
   .animate-ping {
     animation: none;
+  }
+  /* A stopped travelling dot is just a dot parked at the start of the edge,
+     which reads as a rendering bug — hide it instead. The studio disables its
+     JS-driven twin through `useReducedMotion`. */
+  .animate-edge-pulse,
+  .edge-pulse-dot {
+    display: none;
+  }
+  .docs-rule {
+    transition: none;
   }
 }
 
@@ -390,6 +425,12 @@ body {
 }
 .gfx-lite .studio-root [class*="bg-background/"] {
   background-color: rgb(var(--background)) !important;
+}
+/* The drifting hero grid animates `background-position`, which repaints the
+   full-bleed layer every frame — cheap on a desktop GPU, visibly janky on a
+   phone. Freeze it there; the grid itself still renders. */
+.gfx-lite .animate-grid {
+  animation: none !important;
 }
 /* The animated connection dots ride an offset-path; skip them on touch GPUs. */
 .gfx-lite .studio-root .animate-edge-pulse,

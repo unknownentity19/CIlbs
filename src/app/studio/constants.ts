@@ -8,7 +8,7 @@ export const NODE_W = 220;
 export const NODE_H = 76;
 
 /** localStorage key for persisting the user's draft workflow. */
-export const STORAGE_KEY = "hypero.studio.workflow.v1";
+export const STORAGE_KEY = "cilbs.studio.workflow.v1";
 
 /**
  * Per-kind metadata used by the palette and inspector. Default config seeds
@@ -41,7 +41,7 @@ export const NODE_META: Record<
     label: "AI Agent",
     description: "Reason, call tools, and produce structured output.",
     defaultConfig: {
-      model: "gpt-4o",
+      model: "claude-sonnet-5",
       instructions:
         "Classify the incoming message as 'high', 'medium', or 'low' priority and explain why in one sentence.",
       tools: ["http", "search"],

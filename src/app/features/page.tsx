@@ -21,9 +21,11 @@ import {
 } from "@/components/visuals/feature-mocks";
 
 export const metadata: Metadata = {
-  title: "Features — Hypero",
+  // The root layout applies the `%s — Cilbs` template, so this is just
+  // the segment name — spelling out the suffix here rendered it twice.
+  title: "Features",
   description:
-    "Visual workflow builder, AI agent creation, multi-step automation, integrations, API, and an AI reasoning layer — every Hypero feature in detail.",
+    "Visual workflow builder, AI agent creation, multi-step automation, integrations, API, and an AI reasoning layer — every Cilbs feature in detail.",
 };
 
 type Feature = {
@@ -70,7 +72,7 @@ const FEATURES: Feature[] = [
     description: (
       <>
         Define a role, give an agent a set of tools, and drop it onto the
-        canvas. Hypero handles memory, tool selection, and retries so you can
+        canvas. Cilbs handles memory, tool selection, and retries so you can
         focus on what the agent should actually do.
       </>
     ),
@@ -117,7 +119,7 @@ const FEATURES: Feature[] = [
     tagline: "Native connectors for what you use, HTTP for everything else.",
     description: (
       <>
-        Hypero ships with native integrations for the tools your team already
+        Cilbs ships with native integrations for the tools your team already
         uses, and a first-class HTTP node for everything else. Every workflow
         is also automatically exposed as an authenticated API endpoint.
       </>
@@ -165,7 +167,7 @@ const FEATURES: Feature[] = [
     tagline: "Each workflow you deploy gets its own API endpoint.",
     description: (
       <>
-        Deploy Hypero workflows the same way you deploy the rest of your
+        Deploy Cilbs workflows the same way you deploy the rest of your
         backend. Each workflow gets a typed REST endpoint, an SDK, and
         observability — rate limits and audit logs included.
       </>
@@ -178,7 +180,7 @@ const FEATURES: Feature[] = [
     ],
     useCase: {
       title: "Replacing a fragile Lambda setup",
-      body: "A platform team replaces a fragile Lambda + Step Functions setup with a single Hypero workflow exposed at api.company.com/v1/score.",
+      body: "A platform team replaces a fragile Lambda + Step Functions setup with a single Cilbs workflow exposed at api.company.com/v1/score.",
     },
     mock: <MockApi />,
   },

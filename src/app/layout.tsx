@@ -6,11 +6,12 @@ import { CommandPaletteProvider } from "@/components/command/command-palette";
 import { AuthProvider } from "@/components/auth/auth-provider";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
+import { NavigationGuard } from "@/components/navigation-guard";
 import { PageTransition } from "@/components/motion/page-transition";
 import { SITE } from "@/lib/site";
 
 // Bricolage Grotesque is a humanist sans with a tech edge — pairs well with
-// Hypero's gradient hero and feels distinct from the default Geist used by
+// Cilbs's gradient hero and feels distinct from the default Geist used by
 // most Next.js starters.
 const bricolage = Bricolage_Grotesque({
   variable: "--font-geist-sans",
@@ -38,7 +39,7 @@ export const metadata: Metadata = {
     "automation",
     "no-code AI",
     "agentic workflows",
-    "Hypero",
+    "Cilbs",
   ],
   authors: [{ name: SITE.name }],
   creator: SITE.name,
@@ -117,13 +118,40 @@ export default function RootLayout({
               "try{if(navigator.maxTouchPoints>0||matchMedia('(any-pointer:coarse)').matches){document.documentElement.classList.add('gfx-lite')}}catch(e){}",
           }}
         />
+        {/* Apply the saved theme before first paint. ThemeProvider can only
+            read localStorage after hydration, so without this a returning
+            dark-mode visitor gets a full-brightness flash of the light theme
+            on every page load. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{var t=localStorage.getItem('cilbs-theme')||localStorage.getItem('hypero-theme');if(t==='dark'||t==='light'){document.documentElement.classList.toggle('dark',t==='dark');document.documentElement.style.colorScheme=t}}catch(e){}",
+          }}
+        />
+        {/* Scroll reveals start hidden and are un-hidden by an observer once
+            React mounts. With JavaScript disabled that never happens, so
+            every revealed section would render blank — this puts the page
+            back to plain, fully visible HTML in that case. */}
+        <noscript>
+          <style>{`.reveal{opacity:1 !important;transform:none !important}.page-transition{animation:none !important}`}</style>
+        </noscript>
       </head>
       <body className="min-h-full flex flex-col bg-background text-foreground">
+        {/* Keyboard users land here first: one Tab, one Enter, past the nav. */}
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:border focus:border-border focus:bg-card focus:px-4 focus:py-2 focus:text-sm focus:text-foreground"
+        >
+          Skip to content
+        </a>
         <ThemeProvider>
           <AuthProvider>
             <CommandPaletteProvider>
+              {/* Warns before unsaved editor work is thrown away, whether the
+                  visitor leaves the site or just moves to another page. */}
+              <NavigationGuard />
               <Navbar />
-              <main className="flex-1">
+              <main id="main" className="flex-1">
                 <PageTransition>{children}</PageTransition>
               </main>
               <Footer />

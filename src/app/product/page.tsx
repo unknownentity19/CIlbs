@@ -8,9 +8,11 @@ import { ArchitectureDiagram } from "@/components/visuals/architecture-diagram";
 import { Badge } from "@/components/ui/badge";
 
 export const metadata: Metadata = {
-  title: "Product — Hypero",
+  // The root layout applies the `%s — Cilbs` template, so this is just
+  // the segment name — spelling out the suffix here rendered it twice.
+  title: "Product",
   description:
-    "Hypero is the visual AI workflow builder. Learn how it works, why it exists, and how it compares to other automation tools.",
+    "Cilbs is the visual AI workflow builder. Learn how it works, why it exists, and how it compares to other automation tools.",
 };
 
 const PRINCIPLES = [
@@ -33,49 +35,49 @@ const PRINCIPLES = [
 
 const COMPARISON: {
   label: string;
-  hypero: boolean | "partial";
+  cilbs: boolean | "partial";
   nocode: boolean | "partial";
   automation: boolean | "partial";
   agents: boolean | "partial";
 }[] = [
   {
     label: "Visual workflow canvas",
-    hypero: true,
+    cilbs: true,
     nocode: true,
     automation: true,
     agents: false,
   },
   {
     label: "Native AI agents",
-    hypero: true,
+    cilbs: true,
     nocode: false,
     automation: false,
     agents: true,
   },
   {
     label: "Multi-step branching & loops",
-    hypero: true,
+    cilbs: true,
     nocode: "partial",
     automation: "partial",
     agents: false,
   },
   {
     label: "API + SDK access",
-    hypero: true,
+    cilbs: true,
     nocode: false,
     automation: "partial",
     agents: "partial",
   },
   {
     label: "Self-hostable",
-    hypero: true,
+    cilbs: true,
     nocode: false,
     automation: false,
     agents: false,
   },
   {
     label: "Reasoning observability",
-    hypero: true,
+    cilbs: true,
     nocode: false,
     automation: false,
     agents: "partial",
@@ -133,13 +135,13 @@ export default function ProductPage() {
         </Container>
       </Section>
 
-      {/* What Hypero is */}
+      {/* What Cilbs is */}
       <Section className="py-20">
         <Container>
           <div className="grid grid-cols-1 gap-12 md:grid-cols-12">
             <div className="md:col-span-5">
               <Reveal>
-                <Badge variant="outline">What Hypero is</Badge>
+                <Badge variant="outline">What Cilbs is</Badge>
               </Reveal>
               <Reveal delay={0.05}>
                 <h2 className="mt-4 text-3xl sm:text-4xl font-semibold tracking-tight">
@@ -151,7 +153,7 @@ export default function ProductPage() {
               <Reveal delay={0.1}>
                 <p>
                   Most automation tools were built for a deterministic world:
-                  if-this-then-that. Hypero is different. Every node on the
+                  if-this-then-that. Cilbs is different. Every node on the
                   canvas can call an AI model, run an agent, or branch on
                   reasoning — without leaving the workflow.
                 </p>
@@ -207,7 +209,7 @@ export default function ProductPage() {
           <SectionHeader
             eyebrow="Architecture"
             title="How it works under the hood."
-            description="Hypero runs as four layers: triggers kick things off, the reasoning layer handles agent calls, the workflow engine manages execution, and integrations handle the actual work."
+            description="Cilbs runs as four layers: triggers kick things off, the reasoning layer handles agent calls, the workflow engine manages execution, and integrations handle the actual work."
           />
           <Reveal delay={0.1} className="mt-12">
             <ArchitectureDiagram />
@@ -215,7 +217,7 @@ export default function ProductPage() {
         </Container>
       </Section>
 
-      {/* Why Hypero exists */}
+      {/* Why Cilbs exists */}
       <Section className="py-20">
         <Container>
           <div className="grid grid-cols-1 gap-12 md:grid-cols-12">
@@ -241,7 +243,7 @@ export default function ProductPage() {
               </Reveal>
               <Reveal delay={0.15}>
                 <p>
-                  Hypero exists because automation tools weren&apos;t built for
+                  Cilbs exists because automation tools weren&apos;t built for
                   agents, and agent frameworks weren&apos;t built for
                   production. We give teams a single canvas where the prototype
                   and the production system are the same artifact.
@@ -265,18 +267,26 @@ export default function ProductPage() {
         <Container>
           <SectionHeader
             eyebrow="Comparison"
-            title="How Hypero compares."
-            description="No-code tools don't handle agents well. Agent frameworks don't handle production well. Hypero was built to handle both."
+            title="How Cilbs compares."
+            description="No-code tools don't handle agents well. Agent frameworks don't handle production well. Cilbs was built to handle both."
           />
           <Reveal delay={0.1} className="mt-12">
             <div className="overflow-hidden rounded-2xl border border-border bg-card">
-              <div className="overflow-x-auto">
+              {/* Focusable + labelled: the table is wider than a phone, and a
+                  scrollable region with nothing focusable inside cannot be
+                  scrolled from the keyboard. */}
+              <div
+                tabIndex={0}
+                role="region"
+                aria-label="Comparison table"
+                className="overflow-x-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20"
+              >
                 <table className="w-full text-left">
                   <thead className="bg-muted/40">
                     <tr className="text-xs uppercase tracking-wide text-muted-foreground">
                       <th className="px-5 py-4 font-medium">Capability</th>
                       <th className="px-5 py-4 font-medium text-center">
-                        Hypero
+                        Cilbs
                       </th>
                       <th className="px-5 py-4 font-medium text-center">
                         No-code
@@ -297,7 +307,7 @@ export default function ProductPage() {
                       >
                         <td className="px-5 py-4 text-sm">{row.label}</td>
                         <td className="px-5 py-4 text-center">
-                          <Cell value={row.hypero} />
+                          <Cell value={row.cilbs} />
                         </td>
                         <td className="px-5 py-4 text-center">
                           <Cell value={row.nocode} />

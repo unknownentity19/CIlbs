@@ -28,6 +28,17 @@ function useInView<T extends Element>(
       return;
     }
 
+    // Anything already on screen at mount is revealed straight away rather
+    // than waiting for the observer's first callback. Browsers pause that
+    // callback in a background tab, which left above-the-fold content blank
+    // for anyone who opened the site in a new tab and switched to it later.
+    const rect = node.getBoundingClientRect();
+    const viewportHeight = window.innerHeight || 0;
+    if (rect.top < viewportHeight && rect.bottom > 0) {
+      setInView(true);
+      if (once) return;
+    }
+
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {

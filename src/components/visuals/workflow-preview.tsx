@@ -28,7 +28,7 @@ type Node = {
 };
 
 /**
- * Marketing preview of a Hypero workflow. Visuals follow the studio's
+ * Marketing preview of a Cilbs workflow. Visuals follow the studio's
  * category palette (emerald = trigger, violet = AI, amber = logic,
  * sky = action) so the marketing surface feels consistent with the real
  * product.

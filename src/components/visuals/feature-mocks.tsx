@@ -1,6 +1,3 @@
-"use client";
-
-import { motion } from "framer-motion";
 import {
   Bot,
   Braces,
@@ -143,13 +140,9 @@ export function MockAgent() {
             <li className="text-foreground">
               ✓ create_ticket(priority=high)
             </li>
-            <motion.li
-              animate={{ opacity: [0.4, 1, 0.4] }}
-              transition={{ duration: 1.6, repeat: Infinity }}
-              className="text-muted-foreground"
-            >
+            <li className="animate-soft-pulse text-muted-foreground">
               … drafting customer reply
-            </motion.li>
+            </li>
           </ul>
         </div>
       </div>
@@ -252,11 +245,11 @@ export function MockApi() {
       <pre className="text-[11px] leading-relaxed whitespace-pre-wrap break-all">
         <SyntaxHighlight
           language="bash"
-          code={`curl https://api.hypero.dev/v1/workflows/run \\
+          code={`curl https://api.cilbs.com/v1/workflows/run \\
   -H "Authorization: Bearer $HYP" \\
   -d '{
     "workflow": "lead-router",
-    "input": { "email": "ada@hypero.dev" }
+    "input": { "email": "ada@cilbs.com" }
   }'`}
         />
       </pre>

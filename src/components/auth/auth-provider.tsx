@@ -1,28 +1,37 @@
 "use client";
 
 import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+  SessionProvider,
+  signIn as authSignIn,
+  signOut as authSignOut,
+  useSession,
+} from "next-auth/react";
+import { createContext, useContext, useMemo } from "react";
+import { createAccount } from "@/app/(auth)/actions";
+
+/**
+ * Auth context.
+ *
+ * This used to be a mock that kept a fabricated user in `localStorage` —
+ * meaning anyone could grant themselves a session by editing one key. It now
+ * wraps Auth.js: sessions are signed httpOnly cookies, credentials are checked
+ * on the server, and passwords are bcrypt hashes in Postgres.
+ *
+ * The `useAuth()` shape is unchanged so the navbar, dashboard, and auth forms
+ * keep working against the same interface.
+ */
 
 export type User = {
   id: string;
   email: string;
   name: string;
   workspace: string;
-  createdAt: string;
 };
 
-type AuthState = {
+type AuthContextValue = {
   user: User | null;
+  /** False until the session has been resolved, so UI can hold its shape. */
   ready: boolean;
-};
-
-type AuthContextValue = AuthState & {
   signIn: (input: { email: string; password: string }) => Promise<User>;
   signUp: (input: {
     email: string;
@@ -33,111 +42,78 @@ type AuthContextValue = AuthState & {
   signOut: () => void;
 };
 
-const STORAGE_KEY = "hypero-session";
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
-function delay(ms: number) {
-  return new Promise((r) => setTimeout(r, ms));
-}
+function AuthBridge({ children }: { children: React.ReactNode }) {
+  const { data: session, status, update } = useSession();
 
-function deriveName(email: string) {
-  const local = email.split("@")[0] ?? "User";
-  return local
-    .replace(/[._-]+/g, " ")
-    .split(" ")
-    .filter(Boolean)
-    .map((w) => w[0]?.toUpperCase() + w.slice(1))
-    .join(" ");
+  // Derived from the individual fields, not the session object: next-auth
+  // refetches the session on every window focus and hands back a new object
+  // each time. Rebuilding `user` from that identity made consumers re-run
+  // effects on every tab switch — which, in the studio, re-ran hydration and
+  // wiped the undo stack.
+  const id = session?.user?.id;
+  const email = session?.user?.email ?? "";
+  const name = session?.user?.name ?? "";
+  const workspace = session?.user?.workspace ?? "personal";
+
+  const user = useMemo<User | null>(
+    () => (id ? { id, email, name: name || email, workspace } : null),
+    [id, email, name, workspace],
+  );
+
+  const value = useMemo<AuthContextValue>(() => {
+
+    async function signIn(input: { email: string; password: string }) {
+      const result = await authSignIn("credentials", {
+        ...input,
+        redirect: false,
+      });
+      if (!result || result.error) {
+        // 503 is the route handler saying auth isn't configured at all, which
+        // is a very different problem from a wrong password.
+        throw new Error(
+          result?.status === 503
+            ? "Accounts aren't available yet — this deployment has no database or session secret configured."
+            : "That email and password don't match an account.",
+        );
+      }
+      const next = await update();
+      const signedIn = next?.user;
+      if (!signedIn?.id) throw new Error("Could not start a session.");
+      return {
+        id: signedIn.id,
+        email: signedIn.email ?? input.email,
+        name: signedIn.name ?? input.email,
+        workspace: signedIn.workspace ?? "personal",
+      };
+    }
+
+    return {
+      user,
+      ready: status !== "loading",
+      signIn,
+      async signUp(input) {
+        const result = await createAccount(input);
+        if (!result.ok) throw new Error(result.error);
+        // Creating the account signs you straight in — no second form.
+        return signIn({ email: input.email, password: input.password });
+      },
+      signOut() {
+        void authSignOut({ redirect: false });
+      },
+    };
+  }, [user, status, update]);
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [state, setState] = useState<AuthState>({ user: null, ready: false });
-
-  // Hydrate from localStorage
-  useEffect(() => {
-    try {
-      const raw = window.localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        const user = JSON.parse(raw) as User;
-        setState({ user, ready: true });
-        return;
-      }
-    } catch {
-      // ignore
-    }
-    setState({ user: null, ready: true });
-  }, []);
-
-  const persist = useCallback((user: User | null) => {
-    if (typeof window === "undefined") return;
-    if (user) {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
-    } else {
-      window.localStorage.removeItem(STORAGE_KEY);
-    }
-  }, []);
-
-  const signIn = useCallback<AuthContextValue["signIn"]>(
-    async ({ email, password }) => {
-      // Basic mock validation
-      if (!email.includes("@")) {
-        throw new Error("Please enter a valid email address.");
-      }
-      if (password.length < 6) {
-        throw new Error("Password must be at least 6 characters.");
-      }
-      await delay(700);
-      const user: User = {
-        id: `usr_${Math.random().toString(36).slice(2, 10)}`,
-        email,
-        name: deriveName(email),
-        workspace: "personal",
-        createdAt: new Date().toISOString(),
-      };
-      persist(user);
-      setState({ user, ready: true });
-      return user;
-    },
-    [persist],
+  return (
+    <SessionProvider>
+      <AuthBridge>{children}</AuthBridge>
+    </SessionProvider>
   );
-
-  const signUp = useCallback<AuthContextValue["signUp"]>(
-    async ({ email, password, name, workspace }) => {
-      if (!email.includes("@")) {
-        throw new Error("Please enter a valid email address.");
-      }
-      if (password.length < 8) {
-        throw new Error("Password must be at least 8 characters.");
-      }
-      if (!name.trim()) {
-        throw new Error("Please enter your full name.");
-      }
-      await delay(900);
-      const user: User = {
-        id: `usr_${Math.random().toString(36).slice(2, 10)}`,
-        email,
-        name: name.trim(),
-        workspace: (workspace || name.split(" ")[0] || "team").toLowerCase(),
-        createdAt: new Date().toISOString(),
-      };
-      persist(user);
-      setState({ user, ready: true });
-      return user;
-    },
-    [persist],
-  );
-
-  const signOut = useCallback(() => {
-    persist(null);
-    setState({ user: null, ready: true });
-  }, [persist]);
-
-  const value = useMemo<AuthContextValue>(
-    () => ({ ...state, signIn, signUp, signOut }),
-    [state, signIn, signUp, signOut],
-  );
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {

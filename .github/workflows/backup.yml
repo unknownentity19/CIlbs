@@ -1,0 +1,60 @@
+name: Backup database
+
+# Free tiers don't back you up. This dumps the database daily and keeps the
+# dumps as workflow artifacts, which is the piece that makes running on a free
+# database defensible. Restore with:
+#   psql "$DATABASE_URL" < cilbs-YYYY-MM-DD.sql
+on:
+  schedule:
+    - cron: "17 3 * * *" # 03:17 UTC daily
+  workflow_dispatch:
+
+env:
+  # Must be >= the server's major version: pg_dump refuses to dump a server
+  # newer than itself, so a Postgres 18 database and Ubuntu's default client
+  # (16) would fail every night with a version mismatch. Keep this in step
+  # with the Postgres version of the database it points at.
+  PG_MAJOR: "17"
+
+jobs:
+  dump:
+    runs-on: ubuntu-latest
+    # Skip on forks, where the secret won't exist.
+    if: github.repository_owner != ''
+    steps:
+      - name: Install PostgreSQL client
+        # From PGDG rather than the distro, so the version is ours to choose
+        # instead of whatever the runner image happens to ship.
+        run: |
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc \
+            --fail https://www.postgresql.org/media/keys/ACCC4CF8.asc
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] \
+            https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" \
+            | sudo tee /etc/apt/sources.list.d/pgdg.list
+          sudo apt-get update
+          sudo apt-get install -y "postgresql-client-${PG_MAJOR}"
+          pg_dump --version
+
+      - name: Dump
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "DATABASE_URL secret is not set — nothing to back up."
+            exit 0
+          fi
+          mkdir -p dump
+          pg_dump --no-owner --no-privileges --clean --if-exists \
+            --file "dump/cilbs-$(date -u +%Y-%m-%d).sql" "$DATABASE_URL"
+          gzip "dump/cilbs-$(date -u +%Y-%m-%d).sql"
+          ls -lh dump
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: db-backup-${{ github.run_id }}
+          path: dump/
+          # Keep a month of history; artifacts are free within storage limits.
+          retention-days: 30
+          if-no-files-found: ignore

@@ -1,6 +1,4 @@
-"use client";
-
-import { motion } from "framer-motion";
+import { Reveal } from "@/components/motion/reveal";
 import { cn } from "@/lib/utils";
 
 const LAYERS = [
@@ -37,12 +35,10 @@ export function ArchitectureDiagram({ className }: { className?: string }) {
     >
       <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
         {LAYERS.map((layer, i) => (
-          <motion.div
+          <Reveal
             key={layer.title}
-            initial={{ opacity: 0, y: 12 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.3 }}
-            transition={{ duration: 0.5, delay: i * 0.1 }}
+            delay={i * 0.1}
+            amount={0.3}
             className={cn(
               "relative flex flex-col gap-3 rounded-xl border p-4",
               layer.accent
@@ -71,7 +67,7 @@ export function ArchitectureDiagram({ className }: { className?: string }) {
                 </span>
               ))}
             </div>
-          </motion.div>
+          </Reveal>
         ))}
       </div>
       <div className="mt-6 flex items-center justify-between text-[11px] text-muted-foreground">

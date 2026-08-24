@@ -19,7 +19,9 @@ type ThemeContextValue = {
 
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
-const STORAGE_KEY = "hypero-theme";
+const STORAGE_KEY = "cilbs-theme";
+/** Pre-rename key, read once so a saved preference survives the rebrand. */
+const LEGACY_STORAGE_KEY = "hypero-theme";
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<Theme>("light");
@@ -31,9 +33,17 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   // the toggle in the navbar; that choice is persisted.
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const stored = window.localStorage.getItem(STORAGE_KEY) as Theme | null;
+    const stored = (window.localStorage.getItem(STORAGE_KEY) ??
+      window.localStorage.getItem(LEGACY_STORAGE_KEY)) as Theme | null;
     if (stored === "dark" || stored === "light") {
       setThemeState(stored);
+      return;
+    }
+    // The pre-paint script in the root layout may have set the class from a
+    // value written by an older build; trust the DOM as a fallback so the
+    // toggle icon never disagrees with what's on screen.
+    if (document.documentElement.classList.contains("dark")) {
+      setThemeState("dark");
     }
   }, []);
 

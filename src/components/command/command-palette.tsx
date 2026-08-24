@@ -14,6 +14,8 @@ import {
   BookOpen,
   Boxes,
   Code2,
+  Info,
+  LayoutGrid,
   Layers,
   LayoutDashboard,
   LineChart,
@@ -26,6 +28,7 @@ import {
   UserPlus,
   Workflow,
 } from "lucide-react";
+import { confirmDiscard } from "@/lib/unsaved-guard";
 import { useTheme } from "@/components/theme-provider";
 import { useAuth } from "@/components/auth/auth-provider";
 
@@ -66,9 +69,31 @@ export function CommandPaletteProvider({
     return () => window.removeEventListener("keydown", handler);
   }, []);
 
+  // While the palette is open: freeze the page behind it (it used to scroll
+  // under the dialog) and hand focus back to whatever opened it on close.
+  useEffect(() => {
+    if (!isOpen) return;
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+    const body = document.body;
+    const prevOverflow = body.style.overflow;
+    const prevPaddingRight = body.style.paddingRight;
+    const scrollbar = window.innerWidth - document.documentElement.clientWidth;
+    body.style.overflow = "hidden";
+    // Compensate for the vanishing scrollbar so the layout doesn't jump.
+    if (scrollbar > 0) body.style.paddingRight = `${scrollbar}px`;
+    return () => {
+      body.style.overflow = prevOverflow;
+      body.style.paddingRight = prevPaddingRight;
+      previouslyFocused?.focus?.();
+    };
+  }, [isOpen]);
+
   const ctx = useMemo(() => ({ open, close, isOpen }), [open, close, isOpen]);
 
   const go = (href: string) => {
+    // `router.push` bypasses the document click listener in NavigationGuard,
+    // so this asks directly.
+    if (!confirmDiscard()) return;
     setIsOpen(false);
     router.push(href);
   };
@@ -84,7 +109,7 @@ export function CommandPaletteProvider({
               aria-hidden
             />
             <div className="animate-dialog-in relative w-full max-w-xl rounded-2xl border border-border bg-card shadow-2xl overflow-hidden">
-              <Command label="Hypero Command Palette" className="w-full">
+              <Command label="Cilbs Command Palette" className="w-full">
                 <div className="flex items-center gap-3 border-b border-border px-4">
                   <Search className="h-4 w-4 text-muted-foreground" />
                   <Command.Input
@@ -120,6 +145,11 @@ export function CommandPaletteProvider({
                       onSelect={() => go("/features")}
                     />
                     <Item
+                      icon={<LayoutGrid className="h-4 w-4" />}
+                      label="Studio"
+                      onSelect={() => go("/studio")}
+                    />
+                    <Item
                       icon={<LineChart className="h-4 w-4" />}
                       label="Solutions"
                       onSelect={() => go("/solutions")}
@@ -133,6 +163,11 @@ export function CommandPaletteProvider({
                       icon={<Boxes className="h-4 w-4" />}
                       label="Pricing"
                       onSelect={() => go("/pricing")}
+                    />
+                    <Item
+                      icon={<Info className="h-4 w-4" />}
+                      label="About"
+                      onSelect={() => go("/about")}
                     />
                   </Command.Group>
 
@@ -209,7 +244,7 @@ export function CommandPaletteProvider({
                   </Command.Group>
                 </Command.List>
                 <div className="flex items-center justify-between border-t border-border bg-muted/40 px-3 py-2 text-[11px] text-muted-foreground">
-                  <span>Hypero · v0.1</span>
+                  <span>Cilbs · v0.1</span>
                   <span className="flex items-center gap-2">
                     <kbd className="rounded border border-border bg-background px-1.5 py-0.5 font-mono">
                       ↵

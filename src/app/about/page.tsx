@@ -6,16 +6,18 @@ import { Reveal } from "@/components/motion/reveal";
 import { Badge } from "@/components/ui/badge";
 
 export const metadata: Metadata = {
-  title: "About — Hypero",
+  // The root layout applies the `%s — Cilbs` template, so this is just
+  // the segment name — spelling out the suffix here rendered it twice.
+  title: "About",
   description:
-    "Hypero is a bootstrapped, independently funded company. No VCs, no board, no growth-at-all-costs — just a small team building software we're proud of.",
+    "Cilbs is a bootstrapped, independently funded company. No VCs, no board, no growth-at-all-costs — just a small team building software we're proud of.",
 };
 
 const VALUES = [
   {
     icon: <Coins className="h-4 w-4" />,
     title: "Bootstrapped, on purpose",
-    body: "We funded Hypero ourselves and pay the bills with revenue from people who actually use the product. There are no investors to answer to and no clock ticking toward an exit — which means we get to make decisions that are good for the long run instead of good for the next funding round.",
+    body: "We funded Cilbs ourselves and pay the bills with revenue from people who actually use the product. There are no investors to answer to and no clock ticking toward an exit — which means we get to make decisions that are good for the long run instead of good for the next funding round.",
   },
   {
     icon: <Compass className="h-4 w-4" />,
@@ -30,7 +32,7 @@ const VALUES = [
   {
     icon: <HeartHandshake className="h-4 w-4" />,
     title: "Small team, direct line",
-    body: "There's no support tier that hides us from you. When you email Hypero, someone who actually builds the thing reads it. We like it that way, and we intend to keep it that way for as long as we can.",
+    body: "There's no support tier that hides us from you. When you email Cilbs, someone who actually builds the thing reads it. We like it that way, and we intend to keep it that way for as long as we can.",
   },
 ];
 
@@ -47,14 +49,14 @@ export default function AboutPage() {
             </Reveal>
             <Reveal delay={0.05}>
               <h1 className="mt-4 text-5xl sm:text-6xl font-semibold tracking-tight leading-[1.05]">
-                We built Hypero the
+                We built Cilbs the
                 <br />
                 <span className="text-gradient">bootstrapped way.</span>
               </h1>
             </Reveal>
             <Reveal delay={0.15}>
               <p className="mt-6 text-lg text-muted-foreground leading-relaxed max-w-2xl">
-                Hypero is a small, independent company. We didn&apos;t raise a
+                Cilbs is a small, independent company. We didn&apos;t raise a
                 round — we started with our own savings, shipped something people
                 were willing to pay for, and reinvested from there. That single
                 decision shapes almost everything about how we work.
@@ -81,7 +83,7 @@ export default function AboutPage() {
               <Reveal delay={0.1}>
                 <div className="flex flex-col gap-5 text-[15px] leading-relaxed text-muted-foreground">
                   <p>
-                    Hypero started as a tool we needed ourselves. We were tired
+                    Cilbs started as a tool we needed ourselves. We were tired
                     of stitching together prompts, cron jobs, and half-finished
                     scripts every time we wanted to ship something with AI in it.
                     So we built a canvas that let us design, run, and debug those
@@ -148,7 +150,7 @@ export default function AboutPage() {
                 <SectionHeader
                   align="left"
                   title="Want to build with us?"
-                  description="If a small, independent team that answers to its customers sounds like your kind of software, give Hypero a try. We think you'll feel the difference."
+                  description="If a small, independent team that answers to its customers sounds like your kind of software, give Cilbs a try. We think you'll feel the difference."
                 />
               </div>
               <div className="flex flex-wrap gap-3">

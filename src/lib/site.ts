@@ -8,16 +8,16 @@
  */
 
 export const SITE = {
-  name: "Hypero",
+  name: "Cilbs",
   shortDescription: "Build AI workflows visually.",
   description:
-    "Hypero is a visual builder for AI workflows. Design, run, and debug automations, agents, and integrations from a single canvas.",
+    "Cilbs is a visual builder for AI workflows. Design, run, and debug automations, agents, and integrations from a single canvas.",
   url:
     process.env.NEXT_PUBLIC_SITE_URL ??
     (process.env.VERCEL_URL
       ? `https://${process.env.VERCEL_URL}`
       : "http://localhost:3000"),
-  twitter: "@hyperolabs",
+  twitter: "@cilbslabs",
   themeColor: "#ffffff",
   themeColorDark: "#09090b",
   ogImage: "/opengraph-image",

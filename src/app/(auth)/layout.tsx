@@ -34,12 +34,12 @@ export default function AuthLayout({
           >
             <LogoMark />
             <span className="font-semibold tracking-tight text-foreground">
-              Hypero
+              Cilbs
             </span>
           </Link>
           <blockquote className="mt-10 text-2xl font-medium leading-snug tracking-tight text-foreground">
             “We replaced three internal tools, two cron jobs, and a Zapier
-            account with a single Hypero workflow. Our ops team owns it now.”
+            account with a single Cilbs workflow. Our ops team owns it now.”
           </blockquote>
           <div className="mt-6 flex items-center gap-3">
             <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-foreground text-background text-sm font-semibold">

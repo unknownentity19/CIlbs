@@ -26,6 +26,12 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { IntegrationIcon } from "@/components/visuals/integration-icons";
 import { SyntaxHighlight } from "@/components/docs/syntax-highlight";
+import {
+  jsonLd,
+  organizationSchema,
+  softwareSchema,
+  websiteSchema,
+} from "@/lib/structured-data";
 
 /**
  * Rotating accent tones used by lists across the homepage so each card
@@ -33,39 +39,45 @@ import { SyntaxHighlight } from "@/components/docs/syntax-highlight";
  * the look stay coherent across sections (value props, how-it-works,
  * features, security) without picking colours by hand at every call site.
  */
+/**
+ * Per-step accent tones. The light-mode `icon` colours are 700-weight rather
+ * than 600: these render as *text* (the step number) on a tinted 10%-opacity
+ * plate, where 600 measured about 3:1 — under the AA floor. Dark mode keeps
+ * the 400s, which sit on a dark plate and pass comfortably.
+ */
 const TONES = [
   {
-    icon: "text-emerald-600 dark:text-emerald-400",
+    icon: "text-emerald-700 dark:text-emerald-400",
     bg: "bg-emerald-500/10 border-emerald-500/30",
     halo: "shadow-[0_0_28px_-14px_rgb(16_185_129/0.55)]",
     accent: "from-emerald-500/12 via-transparent to-transparent",
   },
   {
-    icon: "text-violet-600 dark:text-violet-400",
+    icon: "text-violet-700 dark:text-violet-400",
     bg: "bg-violet-500/10 border-violet-500/30",
     halo: "shadow-[0_0_28px_-14px_rgb(139_92_246/0.55)]",
     accent: "from-violet-500/12 via-transparent to-transparent",
   },
   {
-    icon: "text-amber-600 dark:text-amber-400",
+    icon: "text-amber-700 dark:text-amber-400",
     bg: "bg-amber-500/10 border-amber-500/30",
     halo: "shadow-[0_0_28px_-14px_rgb(245_158_11/0.55)]",
     accent: "from-amber-500/12 via-transparent to-transparent",
   },
   {
-    icon: "text-sky-600 dark:text-sky-400",
+    icon: "text-sky-700 dark:text-sky-400",
     bg: "bg-sky-500/10 border-sky-500/30",
     halo: "shadow-[0_0_28px_-14px_rgb(14_165_233/0.55)]",
     accent: "from-sky-500/12 via-transparent to-transparent",
   },
   {
-    icon: "text-rose-600 dark:text-rose-400",
+    icon: "text-rose-700 dark:text-rose-400",
     bg: "bg-rose-500/10 border-rose-500/30",
     halo: "shadow-[0_0_28px_-14px_rgb(244_63_94/0.55)]",
     accent: "from-rose-500/12 via-transparent to-transparent",
   },
   {
-    icon: "text-indigo-600 dark:text-indigo-400",
+    icon: "text-indigo-700 dark:text-indigo-400",
     bg: "bg-indigo-500/10 border-indigo-500/30",
     halo: "shadow-[0_0_28px_-14px_rgb(99_102_241/0.55)]",
     accent: "from-indigo-500/12 via-transparent to-transparent",
@@ -186,14 +198,14 @@ const STATS = [
 const TESTIMONIALS = [
   {
     quote:
-      "We replaced three internal tools, two cron jobs, and a Zapier account with a single Hypero workflow. Our ops team owns it now.",
+      "We replaced three internal tools, two cron jobs, and a Zapier account with a single Cilbs workflow. Our ops team owns it now.",
     name: "Amelia Chen",
     role: "Head of RevOps · Lattice",
     initials: "AC",
   },
   {
     quote:
-      "Hypero is the first agent platform that feels like real software. Versioning, replay, observability — it all just works.",
+      "Cilbs is the first agent platform that feels like real software. Versioning, replay, observability — it all just works.",
     name: "Jonas Becker",
     role: "Founding engineer · Modal",
     initials: "JB",
@@ -221,7 +233,7 @@ const SECURITY = [
   {
     icon: <Database className="h-4 w-4" />,
     title: "BYO cloud",
-    desc: "Run Hypero in your AWS, GCP, or Azure VPC.",
+    desc: "Run Cilbs in your AWS, GCP, or Azure VPC.",
   },
   {
     icon: <MessageSquare className="h-4 w-4" />,
@@ -233,6 +245,20 @@ const SECURITY = [
 export default function HomePage() {
   return (
     <>
+      {/* Structured data: tells search engines and assistants that this is a
+          software product from an organisation, rather than leaving them to
+          infer it from the copy. */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLd([
+            organizationSchema(),
+            websiteSchema(),
+            softwareSchema(),
+          ]),
+        }}
+      />
+
       {/* HERO */}
       <Section className="relative overflow-hidden pt-16 pb-24 sm:pt-20">
         <div className="absolute inset-0 -z-10 bg-grid bg-grid-fade animate-grid" />
@@ -271,7 +297,7 @@ export default function HomePage() {
 
             <Reveal delay={0.2}>
               <p className="max-w-2xl text-base sm:text-lg text-muted-foreground leading-relaxed">
-                Stop stitching together scripts to run AI features. Hypero
+                Stop stitching together scripts to run AI features. Cilbs
                 gives you a canvas to build workflows visually, wire up your
                 tools, and ship to production.
               </p>
@@ -322,7 +348,9 @@ export default function HomePage() {
               Backed by
             </p>
           </Reveal>
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-x-10 gap-y-4 opacity-70">
+          {/* No wrapper opacity: stacking it on the muted token measured 2.7:1,
+              well under the 4.5:1 needed for text this size. */}
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-x-10 gap-y-4">
             {TRUSTED.map((name) => (
               <span
                 key={name}
@@ -339,9 +367,9 @@ export default function HomePage() {
       <Section className="py-20">
         <Container>
           <SectionHeader
-            eyebrow="Why Hypero"
+            eyebrow="Why Cilbs"
             title="From prototype to production without the mess."
-            description="Most teams end up with a Zapier workflow, a Python script, and three dashboards to build one intelligent feature. Hypero brings it into one canvas that works the same in development and production."
+            description="Most teams end up with a Zapier workflow, a Python script, and three dashboards to build one intelligent feature. Cilbs brings it into one canvas that works the same in development and production."
           />
           <StaggerGroup className="mt-14 grid grid-cols-1 gap-4 md:grid-cols-3">
             {VALUE_PROPS.map((v, i) => {
@@ -612,7 +640,7 @@ export default function HomePage() {
           <SectionHeader
             eyebrow="Security & compliance"
             title="Security and compliance baked in."
-            description="If your team works in healthcare, finance, or just takes security seriously, Hypero covers the requirements without extra configuration."
+            description="If your team works in healthcare, finance, or just takes security seriously, Cilbs covers the requirements without extra configuration."
           />
           <StaggerGroup className="mt-14 grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-4">
             {SECURITY.map((s, i) => {
@@ -697,17 +725,20 @@ export default function HomePage() {
                       lead-router.ts
                     </span>
                   </div>
-                  <pre className="overflow-x-auto px-5 py-5 text-[12.5px] leading-relaxed">
+                  <pre
+                    tabIndex={0}
+                    className="overflow-x-auto px-5 py-5 text-[12.5px] leading-relaxed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20"
+                  >
 <SyntaxHighlight
   language="ts"
-  code={`import { hypero } from "@hypero/sdk";
+  code={`import { cilbs } from "@cilbs/sdk";
 
-const client = hypero({ apiKey: process.env.HYP! });
+const client = cilbs({ apiKey: process.env.HYP! });
 
 const result = await client.workflows
   .leadRouter
   .run({
-    email: "ada@hypero.dev",
+    email: "ada@cilbs.com",
     source: "website",
   });
 

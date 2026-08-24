@@ -31,7 +31,13 @@ export type NodeConfig = {
   schedule: { cron: string };
   http: { url: string; method: "GET" | "POST" | "PUT" | "DELETE" };
   agent: {
-    model: "gpt-4o" | "claude-3.5-sonnet" | "gemini-1.5-pro" | "llama-3.1-70b";
+    model:
+      | "claude-opus-5"
+      | "claude-sonnet-5"
+      | "claude-haiku-4-5"
+      | "gpt-4o"
+      | "gemini-1.5-pro"
+      | "llama-3.1-70b";
     instructions: string;
     tools: string[];
   };
@@ -55,6 +61,13 @@ export type Edge = {
   id: string;
   from: string; // node id
   to: string; // node id
+  /**
+   * Which side of a condition this edge carries. Only meaningful when the
+   * source node is a `condition`: the runner follows the edges whose branch
+   * matches the evaluated result and skips the rest. Undefined behaves as
+   * "true" so graphs saved before branching existed keep working.
+   */
+  branch?: "true" | "false";
 };
 
 export type Workflow = {
@@ -64,7 +77,13 @@ export type Workflow = {
   edges: Edge[];
 };
 
-export type RunStepStatus = "pending" | "running" | "success" | "error";
+/** `skipped` = the node sat on the branch a condition did not take. */
+export type RunStepStatus =
+  | "pending"
+  | "running"
+  | "success"
+  | "error"
+  | "skipped";
 
 export type RunStep = {
   nodeId: string;

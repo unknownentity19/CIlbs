@@ -17,7 +17,7 @@ const COLUMNS = [
       { label: "Documentation", href: "/docs" },
       { label: "API Reference", href: "/docs#api-reference" },
       { label: "Webhooks", href: "/docs#webhooks" },
-      { label: "Changelog", href: "/docs" },
+      { label: "Authentication", href: "/docs#authentication" },
     ],
   },
   {
@@ -25,17 +25,17 @@ const COLUMNS = [
     links: [
       { label: "About", href: "/about" },
       { label: "Customers", href: "/solutions" },
-      { label: "Careers", href: "/product" },
-      { label: "Contact", href: "/product" },
+      { label: "Security", href: "/security" },
+      { label: "Contact", href: "mailto:hello@cilbs.com" },
     ],
   },
   {
     title: "Resources",
     links: [
-      { label: "Guides", href: "/docs" },
+      { label: "Studio", href: "/studio" },
+      { label: "Quickstart", href: "/docs#quickstart" },
       { label: "Templates", href: "/solutions" },
-      { label: "Community", href: "/docs" },
-      { label: "Status", href: "/docs" },
+      { label: "Core concepts", href: "/docs#concepts" },
     ],
   },
 ];
@@ -64,12 +64,21 @@ export function Footer() {
               <ul className="flex flex-col gap-2.5">
                 {col.links.map((link) => (
                   <li key={link.href + link.label}>
-                    <Link
-                      href={link.href}
-                      className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-                    >
-                      {link.label}
-                    </Link>
+                    {link.href.startsWith("mailto:") ? (
+                      <a
+                        href={link.href}
+                        className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                      >
+                        {link.label}
+                      </a>
+                    ) : (
+                      <Link
+                        href={link.href}
+                        className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                      >
+                        {link.label}
+                      </Link>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -78,16 +87,16 @@ export function Footer() {
         </div>
         <div className="mt-12 flex flex-col-reverse gap-4 border-t border-border pt-6 md:flex-row md:items-center md:justify-between">
           <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} Hypero Labs Inc. All rights reserved.
+            © {new Date().getFullYear()} Cilbs Labs Inc. All rights reserved.
           </p>
           <div className="flex items-center gap-5 text-xs text-muted-foreground">
-            <Link href="/docs" className="hover:text-foreground">
+            <Link href="/privacy" className="hover:text-foreground">
               Privacy
             </Link>
-            <Link href="/docs" className="hover:text-foreground">
+            <Link href="/terms" className="hover:text-foreground">
               Terms
             </Link>
-            <Link href="/docs" className="hover:text-foreground">
+            <Link href="/security" className="hover:text-foreground">
               Security
             </Link>
           </div>

@@ -16,6 +16,7 @@ import {
   LogOut,
   Menu,
   Moon,
+  Shield,
   Sparkles,
   Sun,
   UserPlus,
@@ -28,6 +29,7 @@ import { Logo } from "@/components/brand/logo";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/components/theme-provider";
 import { useAuth } from "@/components/auth/auth-provider";
+import { confirmDiscard } from "@/lib/unsaved-guard";
 import { cn } from "@/lib/utils";
 
 /**
@@ -71,7 +73,7 @@ const NAV_MENUS: MenuGroup[] = [
         label: "Product",
         href: "/product",
         icon: Sparkles,
-        description: "What Hypero is and who it's for.",
+        description: "What Cilbs is and who it's for.",
       },
       {
         label: "Features",
@@ -123,7 +125,7 @@ const NAV_MENUS: MenuGroup[] = [
         label: "About",
         href: "/about",
         icon: Info,
-        description: "Independent and bootstrapped — the team behind Hypero.",
+        description: "Independent and bootstrapped — the team behind Cilbs.",
       },
       {
         label: "Solutions",
@@ -136,6 +138,12 @@ const NAV_MENUS: MenuGroup[] = [
         href: "/pricing",
         icon: Boxes,
         description: "Plans for solo builders to enterprise.",
+      },
+      {
+        label: "Security",
+        href: "/security",
+        icon: Shield,
+        description: "How we protect workflow data.",
       },
     ],
   },
@@ -169,22 +177,33 @@ export function Navbar() {
   }, [pathname]);
 
   // Click-outside: closes the open desktop menu (category or account).
+  // Each ref is checked independently — the previous version required *both*
+  // to exist, so while auth was still resolving (no account menu rendered yet)
+  // `accountRef.current` was null and the whole condition short-circuited,
+  // leaving an open nav menu stuck until the next route change.
   useEffect(() => {
     if (!openMenu && !accountMenuOpen) return;
-    function onClick(e: MouseEvent) {
+    function onPointerDown(e: PointerEvent) {
       const target = e.target as Node;
-      if (
-        menusRef.current &&
-        !menusRef.current.contains(target) &&
-        accountRef.current &&
-        !accountRef.current.contains(target)
-      ) {
-        setOpenMenu(null);
-        setAccountMenuOpen(false);
-      }
+      const insideMenus = menusRef.current?.contains(target) ?? false;
+      const insideAccount = accountRef.current?.contains(target) ?? false;
+      if (insideMenus || insideAccount) return;
+      setOpenMenu(null);
+      setAccountMenuOpen(false);
     }
-    window.addEventListener("mousedown", onClick);
-    return () => window.removeEventListener("mousedown", onClick);
+    function onKey(e: KeyboardEvent) {
+      if (e.key !== "Escape") return;
+      setOpenMenu(null);
+      setAccountMenuOpen(false);
+    }
+    // `pointerdown` so a touch outside closes the menu too — `mousedown`
+    // never fires for the first tap on some mobile browsers.
+    window.addEventListener("pointerdown", onPointerDown);
+    window.addEventListener("keydown", onKey);
+    return () => {
+      window.removeEventListener("pointerdown", onPointerDown);
+      window.removeEventListener("keydown", onKey);
+    };
   }, [openMenu, accountMenuOpen]);
 
   const initials = user
@@ -209,7 +228,7 @@ export function Navbar() {
       <div className="relative mx-auto flex h-16 max-w-6xl items-center px-6">
         {/* Left region — logo */}
         <div className="flex items-center">
-          <Link href="/" className="flex items-center" aria-label="Hypero home">
+          <Link href="/" className="flex items-center" aria-label="Cilbs home">
             <Logo size="lg" />
           </Link>
         </div>
@@ -221,7 +240,14 @@ export function Navbar() {
           className="pointer-events-none absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 md:block"
           ref={menusRef}
         >
-          <ul className="pointer-events-auto flex items-center gap-1">
+          {/* Menus open on hover, so the close belongs on the subtree that
+              holds both the triggers and the panels. Closing only on the
+              panel's own mouseleave left a menu stuck open whenever the
+              pointer left sideways without entering it. */}
+          <ul
+            className="pointer-events-auto flex items-center gap-1"
+            onMouseLeave={() => setOpenMenu(null)}
+          >
             {DIRECT_LINKS.map((link) => {
               const active = pathname === link.href;
               return (
@@ -266,10 +292,13 @@ export function Navbar() {
                     />
                   </button>
                   {openMenu === menu.label ? (
+                      // The outer div's top padding is a transparent bridge:
+                      // with a plain `mt-2` the pointer crossed dead space on
+                      // its way down and the menu closed under the cursor.
+                      <div className="absolute left-0 top-full z-30 pt-2">
                       <div
                         role="menu"
-                        onMouseLeave={() => setOpenMenu(null)}
-                        className="animate-pop-down absolute left-0 top-full z-30 mt-2 w-72 overflow-hidden rounded-2xl border border-border bg-card shadow-lg"
+                        className="animate-pop-down w-72 overflow-hidden rounded-2xl border border-border bg-card shadow-lg"
                       >
                         <ul className="p-1.5">
                           {menu.items.map((item) => {
@@ -313,6 +342,7 @@ export function Navbar() {
                             );
                           })}
                         </ul>
+                      </div>
                       </div>
                     ) : null}
                 </li>
@@ -403,6 +433,7 @@ export function Navbar() {
                     <button
                       type="button"
                       onClick={() => {
+                        if (!confirmDiscard()) return;
                         setAccountMenuOpen(false);
                         signOut();
                         router.push("/");
@@ -493,6 +524,7 @@ export function Navbar() {
                     <li key={link.href}>
                       <Link
                         href={link.href}
+                        onClick={() => setMobileOpen(false)}
                         className={cn(
                           "rounded-xl px-3 py-2.5 text-sm font-medium transition-colors block",
                           active
@@ -522,6 +554,7 @@ export function Navbar() {
                         <li key={item.href}>
                           <Link
                             href={item.href}
+                            onClick={() => setMobileOpen(false)}
                             className={cn(
                               "flex items-start gap-3 rounded-xl px-2.5 py-2 transition-colors",
                               active
@@ -564,6 +597,7 @@ export function Navbar() {
                       size="md"
                       className="w-full"
                       onClick={() => {
+                        if (!confirmDiscard()) return;
                         signOut();
                         router.push("/");
                       }}

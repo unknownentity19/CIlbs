@@ -298,19 +298,25 @@ function tokenizeBash(input: string): Token[] {
   return out;
 }
 
+/**
+ * Token colours. Comments and punctuation used to be drawn at 55-70% opacity,
+ * which measured at 2.6:1 against the code block's background — below the 4.5:1
+ * WCAG AA floor for text this small. They now use the full muted token, which
+ * still reads as secondary without disappearing.
+ */
 const COLOR: Record<TokenKind, string> = {
-  comment: "text-muted-foreground/70 italic",
-  string: "text-emerald-600 dark:text-emerald-400",
-  number: "text-amber-600 dark:text-amber-400",
-  keyword: "text-violet-600 dark:text-violet-400 font-medium",
-  type: "text-sky-600 dark:text-sky-400",
-  builtin: "text-rose-600 dark:text-rose-400",
-  fn: "text-indigo-600 dark:text-indigo-400",
-  punct: "text-foreground/55",
-  operator: "text-fuchsia-600 dark:text-fuchsia-400",
-  boolean: "text-amber-600 dark:text-amber-400",
+  comment: "text-muted-foreground italic",
+  string: "text-emerald-700 dark:text-emerald-400",
+  number: "text-amber-700 dark:text-amber-400",
+  keyword: "text-violet-700 dark:text-violet-400 font-medium",
+  type: "text-sky-700 dark:text-sky-400",
+  builtin: "text-rose-700 dark:text-rose-400",
+  fn: "text-indigo-700 dark:text-indigo-400",
+  punct: "text-muted-foreground",
+  operator: "text-fuchsia-700 dark:text-fuchsia-400",
+  boolean: "text-amber-700 dark:text-amber-400",
   ident: "text-foreground",
-  default: "text-foreground/85",
+  default: "text-foreground",
 };
 
 function tokenize(code: string, lang: Language): Token[] {

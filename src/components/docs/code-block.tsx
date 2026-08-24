@@ -46,7 +46,13 @@ export function CodeBlock({
         <span className="font-mono">{language}</span>
         <span className="font-mono">copy</span>
       </div>
-      <pre className="overflow-x-auto px-4 py-4 text-[12.5px] leading-relaxed">
+      {/* tabIndex: wide code scrolls sideways on a narrow screen, and a
+          scrollable region with nothing focusable inside can't be scrolled
+          from the keyboard at all. */}
+      <pre
+        tabIndex={0}
+        className="overflow-x-auto px-4 py-4 text-[12.5px] leading-relaxed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20"
+      >
         {lang ? (
           <SyntaxHighlight code={children} language={lang} />
         ) : (

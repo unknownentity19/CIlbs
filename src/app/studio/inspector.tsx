@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Trash2 } from "lucide-react";
+import { Copy, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FieldHint, Input, Label } from "@/components/ui/input";
 import { NODE_META } from "./constants";
@@ -19,6 +19,7 @@ export type InspectorProps = {
   node: WorkflowNode | null;
   onChangeLabel: (label: string) => void;
   onChangeConfig: (key: string, value: string | string[]) => void;
+  onDuplicate: () => void;
   onDelete: () => void;
   onClose: () => void;
 };
@@ -27,6 +28,7 @@ export function Inspector({
   node,
   onChangeLabel,
   onChangeConfig,
+  onDuplicate,
   onDelete,
   onClose,
 }: InspectorProps) {
@@ -96,6 +98,12 @@ export function Inspector({
           <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
             Tip
           </p>
+          {node.kind === "condition" ? (
+            <p className="mt-1 text-[12.5px] leading-relaxed text-muted-foreground">
+              Draw two edges out of this node, then click the pill on each to
+              set which one is the true branch and which is the false branch.
+            </p>
+          ) : null}
           <p className="mt-1 text-[12.5px] leading-relaxed text-muted-foreground">
             Use{" "}
             <code className="rounded bg-background px-1 py-0.5 font-mono text-[11px] text-foreground">
@@ -106,15 +114,26 @@ export function Inspector({
         </div>
       </div>
 
-      <div className="border-t border-border p-3">
+      <div className="flex gap-2 border-t border-border p-3">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onDuplicate}
+          className="flex-1"
+          title="Duplicate node (⌘D)"
+        >
+          <Copy className="h-3.5 w-3.5" />
+          Duplicate
+        </Button>
         <Button
           variant="outline"
           size="sm"
           onClick={onDelete}
-          className="w-full"
+          className="flex-1"
+          title="Delete node (⌫)"
         >
           <Trash2 className="h-3.5 w-3.5" />
-          Delete node
+          Delete
         </Button>
       </div>
     </div>
@@ -184,8 +203,10 @@ function KindFields({
             label="Model"
             value={ac.model}
             options={[
+              "claude-opus-5",
+              "claude-sonnet-5",
+              "claude-haiku-4-5",
               "gpt-4o",
-              "claude-3.5-sonnet",
               "gemini-1.5-pro",
               "llama-3.1-70b",
             ]}
