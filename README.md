@@ -106,6 +106,16 @@ npm run dev
 
 The app will start on http://localhost:3000.
 
+Node 24 — `.nvmrc` and `engines` both say so, and CI and Vercel run it.
+
+`package.json` also carries an `allowScripts` allowlist. npm 12 stops running
+dependency install scripts unless they are named there, and npm 11 already
+warns about the ones that aren't. Three need theirs: `esbuild` (drizzle-kit
+and tsx), `unrs-resolver` (the TypeScript resolver eslint uses), and
+`fsevents` (file watching on macOS). They are listed by name rather than
+pinned to a version, so a routine bump doesn't silently disable them — the
+trade is that a future version of those three is approved in advance.
+
 ### Useful scripts
 
 ```bash
@@ -190,6 +200,21 @@ npm run db:studio     # browse the data
 ```
 
 Migrations are committed, so the schema history is reviewable.
+
+`package.json` carries one `overrides` entry for this tooling:
+
+```json
+"@esbuild-kit/esm-loader": "npm:tsx@^4.21.0"
+```
+
+`drizzle-kit` declares `@esbuild-kit/esm-loader`, which npm reports as
+deprecated on every install ("merged into tsx"), and which drags in a second
+copy of esbuild. Nothing in drizzle-kit imports it — the name appears only in
+its `package.json` — and drizzle-kit 1.0 drops it for `jiti`. Until that ships,
+the override points the unused name at the `tsx` drizzle-kit already depends
+on, which is where the package was merged. Verify with `npm run db:generate`:
+it loads `drizzle.config.ts`, so a broken loader fails immediately. Drop the
+override once drizzle-kit 1.0 is stable.
 
 ### Backups
 
