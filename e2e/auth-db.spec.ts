@@ -21,6 +21,16 @@ test.describe("accounts", () => {
   test.skip(process.env.E2E_WITH_DB !== "1", "needs a configured database");
   test.skip(({ isMobile }) => !!isMobile, "desktop layout only");
 
+  /**
+   * This project injects a signed-in storageState for the studio specs, but
+   * every test here establishes whatever session it needs itself — and the
+   * auth pages now turn signed-in visitors away, so arriving with a session
+   * would redirect them off the form before they could use it.
+   */
+  test.beforeEach(async ({ page }) => {
+    await page.context().clearCookies();
+  });
+
   // A fresh address per run keeps repeat runs independent.
   const stamp = Date.now();
   const email = `ada+${stamp}@cilbs.com`;
@@ -37,12 +47,17 @@ test.describe("accounts", () => {
     // Sign-up is rate limited per IP. CI gets a fresh server every run and
     // never trips it; running this suite repeatedly against one long-lived
     // local server does. That's the protection working, not a failure.
-    const rateLimited = await page
-      .getByText(/too many sign-up attempts/i)
-      .isVisible()
-      .catch(() => false);
+    //
+    // Waits for whichever outcome arrives first. A bare isVisible() right
+    // after the click is a race it usually loses — the request hasn't come
+    // back yet, so it reads "not limited" and the test fails later on a
+    // confusing assertion instead of skipping.
+    const rateLimited = page.getByText(/too many sign-up attempts/i);
+    await expect(rateLimited.or(page.getByText(/Welcome back/))).toBeVisible({
+      timeout: 30_000,
+    });
     test.skip(
-      rateLimited,
+      await rateLimited.isVisible(),
       "sign-up rate limit reached — restart the server to clear it",
     );
 
@@ -112,10 +127,6 @@ test.describe("accounts", () => {
       }
     });
 
-    // This project ships a signed-in storageState, and the whole point here is
-    // to start signed out — so drop the session before the first load.
-    await page.context().clearCookies();
-
     // The only full load in this test. Everything after it is a click: a
     // document load clears the client cache, which is what hid this bug.
     await page.goto("/");
@@ -136,17 +147,49 @@ test.describe("accounts", () => {
     });
   });
 
+  /**
+   * Regression: every marketing page has a "Get Started" / "Start building"
+   * button pointing at /signup, and those pages are static so they render the
+   * same for everyone. A signed-in visitor who clicked one was shown "Create
+   * your account" with the navbar above it still showing them signed in.
+   */
+  test("turns a signed-in visitor away from the auth pages", async ({
+    page,
+  }) => {
+    await page.goto("/signin");
+    await page.getByLabel(/^(Work )?email$/i).fill(email);
+    await page.getByLabel("Password").fill(password);
+    await page.getByRole("button", { name: /^Sign in$/ }).click();
+    await expect(page).toHaveURL(/\/dashboard/, { timeout: 30_000 });
+
+    for (const path of ["/signup", "/signin"]) {
+      await page.goto(path);
+      await expect(page).toHaveURL(/\/dashboard/, { timeout: 20_000 });
+      // Not a heading check: the dashboard's own heading is "Welcome back,
+      // <name>", which matches the sign-in page's. The absence of a password
+      // field is unambiguous.
+      await expect(page.getByLabel("Password")).toHaveCount(0);
+    }
+
+    // And `?next=` is honoured rather than dropped on the floor.
+    await page.goto("/signin?next=%2Fstudio");
+    await expect(page).toHaveURL(/\/studio/, { timeout: 20_000 });
+  });
+
   test("an address can't be registered twice", async ({ page }) => {
     await page.goto("/signup");
     await page.getByLabel("Full name").fill("Ada Again");
     await page.getByLabel(/^(Work )?email$/i).fill(email);
     await page.getByLabel("Password").fill(password);
     await page.getByRole("button", { name: /Create free account/i }).click();
-    const limited = await page
-      .getByText(/too many sign-up attempts/i)
-      .isVisible()
-      .catch(() => false);
-    test.skip(limited, "sign-up rate limit reached — restart the server to clear it");
-    await expect(page.getByText(/already exists/i)).toBeVisible();
+    // Same race as above: wait for whichever message the server sends.
+    const limited = page.getByText(/too many sign-up attempts/i);
+    const exists = page.getByText(/already exists/i);
+    await expect(limited.or(exists)).toBeVisible({ timeout: 30_000 });
+    test.skip(
+      await limited.isVisible(),
+      "sign-up rate limit reached — restart the server to clear it",
+    );
+    await expect(exists).toBeVisible();
   });
 });
