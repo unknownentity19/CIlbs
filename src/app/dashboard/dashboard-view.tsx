@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -71,13 +70,10 @@ export function DashboardView() {
   const { user, ready, signOut } = useAuth();
   const router = useRouter();
 
-  // The page-level server component is what actually gates this route; this
-  // only covers the gap between signing out here and the navigation landing.
-  useEffect(() => {
-    if (ready && !user) {
-      router.replace("/signin?next=/dashboard");
-    }
-  }, [ready, user, router]);
+  // No client-side redirect here. The server component and the proxy gate this
+  // route, and a guard that fires the moment the session clears also fires
+  // during an intentional sign-out — racing the "go home" navigation and
+  // winning, so signing out landed on the sign-in page instead.
 
   if (!ready || !user) {
     return (
@@ -112,8 +108,8 @@ export function DashboardView() {
             <Button
               size="md"
               variant="ghost"
-              onClick={() => {
-                signOut();
+              onClick={async () => {
+                await signOut();
                 router.push("/");
               }}
             >

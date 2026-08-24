@@ -432,10 +432,10 @@ export function Navbar() {
                     </ul>
                     <button
                       type="button"
-                      onClick={() => {
+                      onClick={async () => {
                         if (!confirmDiscard()) return;
                         setAccountMenuOpen(false);
-                        signOut();
+                        await signOut();
                         router.push("/");
                       }}
                       className="flex w-full items-center gap-2 border-t border-border px-3 py-2.5 text-sm text-foreground hover:bg-accent"
@@ -596,9 +596,9 @@ export function Navbar() {
                       variant="outline"
                       size="md"
                       className="w-full"
-                      onClick={() => {
+                      onClick={async () => {
                         if (!confirmDiscard()) return;
-                        signOut();
+                        await signOut();
                         router.push("/");
                       }}
                     >

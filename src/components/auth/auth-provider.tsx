@@ -39,7 +39,13 @@ type AuthContextValue = {
     name: string;
     workspace?: string;
   }) => Promise<User>;
-  signOut: () => void;
+  /**
+   * Resolves once the session is actually gone. Awaiting it matters: the
+   * fire-and-forget version let callers navigate first, so a visitor could
+   * land on the home page still holding a valid session — and still open the
+   * dashboard — until the request caught up.
+   */
+  signOut: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -99,8 +105,8 @@ function AuthBridge({ children }: { children: React.ReactNode }) {
         // Creating the account signs you straight in — no second form.
         return signIn({ email: input.email, password: input.password });
       },
-      signOut() {
-        void authSignOut({ redirect: false });
+      async signOut() {
+        await authSignOut({ redirect: false });
       },
     };
   }, [user, status, update]);

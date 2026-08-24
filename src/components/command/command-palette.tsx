@@ -201,9 +201,9 @@ export function CommandPaletteProvider({
                         <Item
                           icon={<LogOut className="h-4 w-4" />}
                           label="Sign out"
-                          onSelect={() => {
+                          onSelect={async () => {
                             setIsOpen(false);
-                            signOut();
+                            await signOut();
                             router.push("/");
                           }}
                         />
