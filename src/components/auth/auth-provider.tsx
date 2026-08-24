@@ -39,7 +39,6 @@ type AuthContextValue = {
     email: string;
     password: string;
     name: string;
-    workspace?: string;
   }) => Promise<void>;
   /**
    * Resolves once the session is actually gone. Awaiting it matters: the

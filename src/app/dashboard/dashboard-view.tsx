@@ -103,7 +103,7 @@ export function DashboardView() {
             </p>
           </div>
           <div className="flex gap-2">
-            <Button href="/features" variant="outline" size="md">
+            <Button href="/studio" variant="outline" size="md">
               <Plus className="h-4 w-4" /> New workflow
             </Button>
             <Button

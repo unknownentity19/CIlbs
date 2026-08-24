@@ -39,6 +39,15 @@ test.describe("accounts", () => {
   test("sign up, sign out, sign back in", async ({ page }) => {
     await page.goto("/signup");
 
+    // Three fields, deliberately. The workspace is derived from the name on
+    // the server rather than asked for, so a fourth box appearing here is a
+    // regression, not a feature.
+    await expect(page.locator("form label")).toHaveText([
+      "Full name",
+      "Work email",
+      "Password",
+    ]);
+
     await page.getByLabel("Full name").fill("Ada Lovelace");
     await page.getByLabel(/^(Work )?email$/i).fill(email);
     await page.getByLabel("Password").fill(password);
@@ -64,6 +73,16 @@ test.describe("accounts", () => {
     // Creating an account signs you straight in.
     await expect(page).toHaveURL(/\/dashboard/, { timeout: 20_000 });
     await expect(page.getByText(/Ada/).first()).toBeVisible();
+    // Derived from the first name, lowercased.
+    await expect(page.getByText(/signed in to the\s+ada\s+workspace/i)).toBeVisible();
+
+    // "New workflow" opens the editor. It used to point at /features, which
+    // sent someone who wanted to build a workflow to a marketing page.
+    await page.getByRole("link", { name: /New workflow/i }).click();
+    await expect(page).toHaveURL(/\/studio/, { timeout: 30_000 });
+    await expect(page.getByLabel("Workflow canvas")).toBeVisible({
+      timeout: 30_000,
+    });
 
     // The studio should now report the account as the sink.
     await page.goto("/studio");

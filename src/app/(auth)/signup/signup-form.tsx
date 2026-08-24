@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
 import { ArrowRight, Check, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { FieldError, FieldHint, Input, Label } from "@/components/ui/input";
+import { FieldError, Input, Label } from "@/components/ui/input";
 import { useAuth } from "@/components/auth/auth-provider";
 import { goAfterAuth, safeDestination } from "@/lib/post-auth-navigation";
 import { SocialButtons } from "@/components/auth/social-buttons";
@@ -21,7 +21,6 @@ export function SignUpForm({ providers }: { providers: AuthProviders }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [workspace, setWorkspace] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   // Until React has hydrated, this form has no submit handler — and a click on
@@ -37,7 +36,7 @@ export function SignUpForm({ providers }: { providers: AuthProviders }) {
     setError(null);
     setPending(true);
     try {
-      await signUp({ email, password, name, workspace });
+      await signUp({ email, password, name });
       goAfterAuth(next);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
@@ -102,19 +101,6 @@ export function SignUpForm({ providers }: { providers: AuthProviders }) {
               onChange={(e) => setEmail(e.target.value)}
               required
             />
-          </div>
-
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="workspace">Workspace name</Label>
-            <Input
-              id="workspace"
-              placeholder="acme"
-              value={workspace}
-              onChange={(e) => setWorkspace(e.target.value)}
-            />
-            <FieldHint>
-              Used in URLs and API calls. You can change it later.
-            </FieldHint>
           </div>
 
           <div className="flex flex-col gap-1.5">

@@ -21,7 +21,6 @@ const signUpSchema = z.object({
   email: z.string().trim().toLowerCase().email("Enter a valid email address."),
   password: z.string().min(8, "Password must be at least 8 characters."),
   name: z.string().trim().min(1, "Enter your name.").max(120),
-  workspace: z.string().trim().max(60).optional(),
 });
 
 export type SignUpResult = { ok: true } | { ok: false; error: string };
@@ -54,7 +53,7 @@ export async function createAccount(input: unknown): Promise<SignUpResult> {
   if (!parsed.success) {
     return { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid details." };
   }
-  const { email, password, name, workspace } = parsed.data;
+  const { email, password, name } = parsed.data;
 
   try {
     const [existing] = await getDb()
@@ -70,7 +69,11 @@ export async function createAccount(input: unknown): Promise<SignUpResult> {
       email,
       name,
       passwordHash: await bcrypt.hash(password, COST),
-      workspace: (workspace || name.split(" ")[0] || "personal").toLowerCase(),
+      // Derived rather than asked for. Sign-up is three fields, and naming a
+      // workspace is not a decision worth making before you've seen the
+      // product — it's a label in the account menu, not something that has to
+      // be right up front.
+      workspace: (name.split(" ")[0] || "personal").toLowerCase(),
     });
     return { ok: true };
   } catch (error) {
