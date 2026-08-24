@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { LogoMark } from "@/components/brand/logo";
+import { Portrait } from "@/components/brand/portrait";
 
 export default function AuthLayout({
   children,
@@ -42,12 +43,12 @@ export default function AuthLayout({
             account with a single Cilbs workflow. Our ops team owns it now.”
           </blockquote>
           <div className="mt-6 flex items-center gap-3">
-            <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-foreground text-background text-sm font-semibold">
-              AC
-            </span>
+            <Portrait className="h-9 w-9 shrink-0 rounded-full" />
             <div className="text-sm">
-              <p className="text-foreground font-medium">Amelia Chen</p>
-              <p className="text-muted-foreground">Head of RevOps · Lattice</p>
+              <p className="text-foreground font-medium">Oliver Bennett</p>
+              <p className="text-muted-foreground">
+                Head of RevOps · Ashcombe Retail
+              </p>
             </div>
           </div>
 

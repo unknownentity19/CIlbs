@@ -199,22 +199,22 @@ const TESTIMONIALS = [
   {
     quote:
       "We replaced three internal tools, two cron jobs, and a Zapier account with a single Cilbs workflow. Our ops team owns it now.",
-    name: "Amelia Chen",
-    role: "Head of RevOps · Lattice",
-    initials: "AC",
+    name: "Oliver Bennett",
+    role: "Head of RevOps · Ashcombe Retail",
+    initials: "OB",
   },
   {
     quote:
       "Cilbs is the first agent platform that feels like real software. Versioning, replay, observability — it all just works.",
     name: "Jonas Becker",
-    role: "Founding engineer · Modal",
+    role: "Founding engineer · Greyloft",
     initials: "JB",
   },
   {
     quote:
       "We went from a notebook prototype to a production API in the same week. I kept waiting for something to break, but it held up.",
     name: "Priya Raman",
-    role: "Engineering lead · Linear",
+    role: "Engineering lead · Marchmont Health",
     initials: "PR",
   },
 ];
