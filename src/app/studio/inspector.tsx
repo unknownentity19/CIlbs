@@ -9,10 +9,10 @@ import { NodeIcon } from "./node-icon";
 import { NODE_CATEGORY, type WorkflowNode } from "./types";
 
 const CATEGORY_TONE: Record<string, string> = {
-  trigger: "text-emerald-600 dark:text-emerald-400",
-  ai: "text-violet-600 dark:text-violet-400",
-  logic: "text-amber-600 dark:text-amber-400",
-  action: "text-sky-600 dark:text-sky-400",
+  trigger: "text-emerald-600",
+  ai: "text-violet-600",
+  logic: "text-amber-600",
+  action: "text-sky-600",
 };
 
 export type InspectorProps = {

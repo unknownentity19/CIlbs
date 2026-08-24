@@ -51,7 +51,7 @@ export function FieldError({ children }: { children: React.ReactNode }) {
   return (
     <p
       role="alert"
-      className="rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-600 dark:text-red-400"
+      className="rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-600"
     >
       {children}
     </p>

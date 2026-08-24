@@ -41,32 +41,53 @@ for (const path of PAGES) {
 }
 
 /**
- * The site doesn't follow the system colour scheme — it persists an explicit
- * choice — so the dark palette has to be selected before the page paints to be
- * measured at all.
+ * The site is light only. There is no theme toggle and no dark palette, so the
+ * risk isn't a bad dark theme — it's a visitor whose system asks for dark
+ * getting one anyway. This checks what such a visitor actually sees;
+ * `tests/light-only.test.ts` checks the source that would cause it.
  */
-test.describe("dark theme", () => {
+test.describe("with a system that prefers dark", () => {
   test.use({ colorScheme: "dark" });
 
-  for (const path of ["/", "/pricing"]) {
-    test(`${path} passes in dark mode`, async ({ page }) => {
-      await page.emulateMedia({ reducedMotion: "reduce" });
-      await page.goto("/");
-      await page.evaluate(() =>
-        window.localStorage.setItem("cilbs-theme", "dark"),
-      );
+  for (const path of ["/", "/pricing", "/signin"]) {
+    test(`${path} still renders light`, async ({ page }) => {
       await page.goto(path);
       await page.waitForLoadState("networkidle");
 
-      const results = await new AxeBuilder({ page })
-        .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
-        .analyze();
-      const blocking = results.violations.filter(
-        (v) => v.impact === "critical" || v.impact === "serious",
-      );
-      expect(
-        blocking.map((v) => `${v.id}: ${v.help} (${v.nodes.length} nodes)`),
-      ).toEqual([]);
+      const paint = await page.evaluate(() => {
+        const html = document.documentElement;
+        return {
+          background: getComputedStyle(document.body).backgroundColor,
+          foreground: getComputedStyle(document.body).color,
+          colorScheme: getComputedStyle(html).colorScheme,
+          darkClass: html.classList.contains("dark"),
+        };
+      });
+
+      expect(paint.background).toBe("rgb(255, 255, 255)");
+      // Near-black on white, not the inverse.
+      expect(paint.foreground).toBe("rgb(9, 9, 11)");
+      // Pinned so form controls and scrollbars stay light too.
+      expect(paint.colorScheme).toBe("light");
+      expect(paint.darkClass).toBe(false);
     });
   }
+
+  test("passes the same accessibility bar under a dark system", async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
+
+    const results = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+      .analyze();
+    const blocking = results.violations.filter(
+      (v) => v.impact === "critical" || v.impact === "serious",
+    );
+    expect(
+      blocking.map((v) => `${v.id}: ${v.help} (${v.nodes.length} nodes)`),
+    ).toEqual([]);
+  });
 });

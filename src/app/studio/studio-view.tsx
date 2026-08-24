@@ -944,8 +944,8 @@ export function StudioView({
                     className={
                       "ml-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] " +
                       (errorCount > 0
-                        ? "bg-red-500/15 text-red-600 dark:text-red-400"
-                        : "bg-amber-500/15 text-amber-600 dark:text-amber-400")
+                        ? "bg-red-500/15 text-red-600"
+                        : "bg-amber-500/15 text-amber-600")
                     }
                   >
                     {issues.length}

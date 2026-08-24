@@ -21,15 +21,12 @@ import {
   LineChart,
   LogIn,
   LogOut,
-  Moon,
   Search,
   Sparkles,
-  Sun,
   UserPlus,
   Workflow,
 } from "lucide-react";
 import { confirmDiscard } from "@/lib/unsaved-guard";
-import { useTheme } from "@/components/theme-provider";
 import { useAuth } from "@/components/auth/auth-provider";
 
 type Ctx = { open: () => void; close: () => void; isOpen: boolean };
@@ -50,7 +47,6 @@ export function CommandPaletteProvider({
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
-  const { theme, toggleTheme } = useTheme();
   const { user, signOut } = useAuth();
 
   const open = useCallback(() => setIsOpen(true), []);
@@ -227,25 +223,6 @@ export function CommandPaletteProvider({
                         />
                       </>
                     )}
-                  </Command.Group>
-
-                  <Command.Group
-                    heading="Settings"
-                    className="px-2 pb-1 pt-3 text-[11px] uppercase tracking-wide text-muted-foreground"
-                  >
-                    <Item
-                      icon={
-                        theme === "dark" ? (
-                          <Sun className="h-4 w-4" />
-                        ) : (
-                          <Moon className="h-4 w-4" />
-                        )
-                      }
-                      label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
-                      onSelect={() => {
-                        toggleTheme();
-                      }}
-                    />
                   </Command.Group>
                 </Command.List>
                 <div className="flex items-center justify-between border-t border-border bg-muted/40 px-3 py-2 text-[11px] text-muted-foreground">

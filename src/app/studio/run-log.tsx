@@ -61,11 +61,11 @@ export function RunLog({ run }: { run: RunState }) {
           className={
             "inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[10px] " +
             (run.status === "running"
-              ? "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400"
+              ? "border-amber-500/30 bg-amber-500/10 text-amber-700"
               : run.status === "success"
-                ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
+                ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-700"
                 : run.status === "error"
-                  ? "border-red-500/30 bg-red-500/10 text-red-700 dark:text-red-400"
+                  ? "border-red-500/30 bg-red-500/10 text-red-700"
                   : "border-border bg-muted text-muted-foreground")
           }
         >
@@ -90,7 +90,7 @@ export function RunLog({ run }: { run: RunState }) {
           <span>{summary.ran} ran</span>
           {summary.skipped > 0 ? <span>{summary.skipped} skipped</span> : null}
           {summary.failed > 0 ? (
-            <span className="text-red-600 dark:text-red-400">
+            <span className="text-red-600">
               {summary.failed} failed
             </span>
           ) : null}

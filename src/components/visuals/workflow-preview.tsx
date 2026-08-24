@@ -123,32 +123,32 @@ const CATEGORY_TONES: Record<
   }
 > = {
   trigger: {
-    icon: "text-emerald-600 dark:text-emerald-400",
+    icon: "text-emerald-600",
     iconBg: "bg-emerald-500/10 border-emerald-500/30",
     border: "border-emerald-500/40",
     halo: "shadow-[0_0_24px_-12px_rgb(16_185_129/0.55)]",
-    badge: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
+    badge: "bg-emerald-500/10 text-emerald-700",
   },
   ai: {
-    icon: "text-violet-600 dark:text-violet-400",
+    icon: "text-violet-600",
     iconBg: "bg-violet-500/10 border-violet-500/30",
     border: "border-violet-500/40",
     halo: "shadow-[0_0_28px_-10px_rgb(139_92_246/0.55)]",
-    badge: "bg-violet-500/10 text-violet-700 dark:text-violet-400",
+    badge: "bg-violet-500/10 text-violet-700",
   },
   logic: {
-    icon: "text-amber-600 dark:text-amber-400",
+    icon: "text-amber-600",
     iconBg: "bg-amber-500/10 border-amber-500/30",
     border: "border-amber-500/40",
     halo: "shadow-[0_0_24px_-12px_rgb(245_158_11/0.55)]",
-    badge: "bg-amber-500/10 text-amber-700 dark:text-amber-400",
+    badge: "bg-amber-500/10 text-amber-700",
   },
   action: {
-    icon: "text-sky-600 dark:text-sky-400",
+    icon: "text-sky-600",
     iconBg: "bg-sky-500/10 border-sky-500/30",
     border: "border-sky-500/40",
     halo: "shadow-[0_0_24px_-12px_rgb(14_165_233/0.55)]",
-    badge: "bg-sky-500/10 text-sky-700 dark:text-sky-400",
+    badge: "bg-sky-500/10 text-sky-700",
   },
 };
 
@@ -177,7 +177,7 @@ export function WorkflowPreview({ className }: { className?: string }) {
           </span>
           <Breadcrumb />
         </div>
-        <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-700 dark:text-emerald-400">
+        <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-700">
           <span className="relative flex h-1.5 w-1.5">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-60" />
             <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />

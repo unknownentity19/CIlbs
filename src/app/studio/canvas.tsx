@@ -31,23 +31,23 @@ import {
  * dropping from the palette all feel consistent at any zoom level.
  *
  * Controls:
- *   - Drag empty space → pan (one finger on touch)
- *   - Two fingers       → pinch zoom
- *   - Wheel             → pan (trackpad two-finger)
- *   - Ctrl/Cmd + wheel  → zoom around cursor
- *   - Ctrl/Cmd + / −    → zoom, Ctrl/Cmd + 0 → 100%
- *   - F                 → fit graph to view
- *   - Arrows            → nudge selection by one grid step (⇧ = ×4)
- *   - Backspace         → delete selected node
- *   - Escape            → cancel a half-drawn edge, then deselect
+ * - Drag empty space → pan (one finger on touch)
+ * - Two fingers       → pinch zoom
+ * - Wheel             → pan (trackpad two-finger)
+ * - Ctrl/Cmd + wheel  → zoom around cursor
+ * - Ctrl/Cmd + / −    → zoom, Ctrl/Cmd + 0 → 100%
+ * - F                 → fit graph to view
+ * - Arrows            → nudge selection by one grid step (⇧ = ×4)
+ * - Backspace         → delete selected node
+ * - Escape            → cancel a half-drawn edge, then deselect
  */
 
 const CATEGORY_TONE: Record<string, string> = {
   trigger:
-    "border-emerald-500/40 dark:border-emerald-500/30 bg-emerald-500/5",
-  ai: "border-violet-500/40 dark:border-violet-500/30 bg-violet-500/5",
-  logic: "border-amber-500/40 dark:border-amber-500/30 bg-amber-500/5",
-  action: "border-sky-500/40 dark:border-sky-500/30 bg-sky-500/5",
+    "border-emerald-500/40 bg-emerald-500/5",
+  ai: "border-violet-500/40 bg-violet-500/5",
+  logic: "border-amber-500/40 bg-amber-500/5",
+  action: "border-sky-500/40 bg-sky-500/5",
 };
 
 const MIN_SCALE = 0.25;
@@ -939,7 +939,7 @@ function EdgeView({
             className={cn(
               "flex h-[22px] w-[52px] items-center justify-center rounded-full border text-[10px] font-medium transition-colors",
               branch === "true"
-                ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
+                ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-700"
                 : "border-border bg-background text-muted-foreground",
             )}
           >
@@ -1103,7 +1103,7 @@ function NodeView({
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={badgeTransition}
-                  className="rounded-full bg-emerald-500/15 px-1.5 py-0.5 text-[9px] text-emerald-700 dark:text-emerald-400"
+                  className="rounded-full bg-emerald-500/15 px-1.5 py-0.5 text-[9px] text-emerald-700"
                 >
                   ok
                 </motion.span>

@@ -47,37 +47,37 @@ import {
  */
 const TONES = [
   {
-    icon: "text-emerald-700 dark:text-emerald-400",
+    icon: "text-emerald-700",
     bg: "bg-emerald-500/10 border-emerald-500/30",
     halo: "shadow-[0_0_28px_-14px_rgb(16_185_129/0.55)]",
     accent: "from-emerald-500/12 via-transparent to-transparent",
   },
   {
-    icon: "text-violet-700 dark:text-violet-400",
+    icon: "text-violet-700",
     bg: "bg-violet-500/10 border-violet-500/30",
     halo: "shadow-[0_0_28px_-14px_rgb(139_92_246/0.55)]",
     accent: "from-violet-500/12 via-transparent to-transparent",
   },
   {
-    icon: "text-amber-700 dark:text-amber-400",
+    icon: "text-amber-700",
     bg: "bg-amber-500/10 border-amber-500/30",
     halo: "shadow-[0_0_28px_-14px_rgb(245_158_11/0.55)]",
     accent: "from-amber-500/12 via-transparent to-transparent",
   },
   {
-    icon: "text-sky-700 dark:text-sky-400",
+    icon: "text-sky-700",
     bg: "bg-sky-500/10 border-sky-500/30",
     halo: "shadow-[0_0_28px_-14px_rgb(14_165_233/0.55)]",
     accent: "from-sky-500/12 via-transparent to-transparent",
   },
   {
-    icon: "text-rose-700 dark:text-rose-400",
+    icon: "text-rose-700",
     bg: "bg-rose-500/10 border-rose-500/30",
     halo: "shadow-[0_0_28px_-14px_rgb(244_63_94/0.55)]",
     accent: "from-rose-500/12 via-transparent to-transparent",
   },
   {
-    icon: "text-indigo-700 dark:text-indigo-400",
+    icon: "text-indigo-700",
     bg: "bg-indigo-500/10 border-indigo-500/30",
     halo: "shadow-[0_0_28px_-14px_rgb(99_102_241/0.55)]",
     accent: "from-indigo-500/12 via-transparent to-transparent",

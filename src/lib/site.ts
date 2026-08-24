@@ -48,7 +48,6 @@ export const SITE = {
   ),
   twitter: "@cilbslabs",
   themeColor: "#ffffff",
-  themeColorDark: "#09090b",
   ogImage: "/opengraph-image",
 } as const;
 

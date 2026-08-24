@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "@/components/theme-provider";
 import { CommandPaletteProvider } from "@/components/command/command-palette";
 import { AuthProvider } from "@/components/auth/auth-provider";
 import { Navbar } from "@/components/layout/navbar";
@@ -9,7 +8,7 @@ import { Footer } from "@/components/layout/footer";
 import { NavigationGuard } from "@/components/navigation-guard";
 import { PageTransition } from "@/components/motion/page-transition";
 import { SITE } from "@/lib/site";
-import { GFX_LITE_SCRIPT, THEME_SCRIPT } from "@/lib/inline-scripts";
+import { GFX_LITE_SCRIPT } from "@/lib/inline-scripts";
 
 // Bricolage Grotesque is a humanist sans with a tech edge — pairs well with
 // Cilbs's gradient hero and feels distinct from the default Geist used by
@@ -89,10 +88,8 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: SITE.themeColor },
-    { media: "(prefers-color-scheme: dark)", color: SITE.themeColorDark },
-  ],
+  // One colour: the site is light regardless of the visitor's system setting.
+  themeColor: SITE.themeColor,
 };
 
 export default function RootLayout({
@@ -114,11 +111,6 @@ export default function RootLayout({
             mode, where width/pointer media queries no longer match. Running
             synchronously here avoids a first-frame composite with blur on. */}
         <script dangerouslySetInnerHTML={{ __html: GFX_LITE_SCRIPT }} />
-        {/* Apply the saved theme before first paint. ThemeProvider can only
-            read localStorage after hydration, so without this a returning
-            dark-mode visitor gets a full-brightness flash of the light theme
-            on every page load. */}
-        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
         {/* Scroll reveals start hidden and are un-hidden by an observer once
             React mounts. With JavaScript disabled that never happens, so
             every revealed section would render blank — this puts the page
@@ -135,7 +127,6 @@ export default function RootLayout({
         >
           Skip to content
         </a>
-        <ThemeProvider>
           <AuthProvider>
             <CommandPaletteProvider>
               {/* Warns before unsaved editor work is thrown away, whether the
@@ -148,7 +139,6 @@ export default function RootLayout({
               <Footer />
             </CommandPaletteProvider>
           </AuthProvider>
-        </ThemeProvider>
       </body>
     </html>
   );

@@ -306,15 +306,15 @@ function tokenizeBash(input: string): Token[] {
  */
 const COLOR: Record<TokenKind, string> = {
   comment: "text-muted-foreground italic",
-  string: "text-emerald-700 dark:text-emerald-400",
-  number: "text-amber-700 dark:text-amber-400",
-  keyword: "text-violet-700 dark:text-violet-400 font-medium",
-  type: "text-sky-700 dark:text-sky-400",
-  builtin: "text-rose-700 dark:text-rose-400",
-  fn: "text-indigo-700 dark:text-indigo-400",
+  string: "text-emerald-700",
+  number: "text-amber-700",
+  keyword: "text-violet-700 font-medium",
+  type: "text-sky-700",
+  builtin: "text-rose-700",
+  fn: "text-indigo-700",
   punct: "text-muted-foreground",
-  operator: "text-fuchsia-700 dark:text-fuchsia-400",
-  boolean: "text-amber-700 dark:text-amber-400",
+  operator: "text-fuchsia-700",
+  boolean: "text-amber-700",
   ident: "text-foreground",
   default: "text-foreground",
 };

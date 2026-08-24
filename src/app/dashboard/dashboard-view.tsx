@@ -176,8 +176,8 @@ export function DashboardView() {
                     <span
                       className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[11px] ${
                         w.status === "healthy"
-                          ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
-                          : "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400"
+                          ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-700"
+                          : "border-amber-500/30 bg-amber-500/10 text-amber-700"
                       }`}
                     >
                       <span

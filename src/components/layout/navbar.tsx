@@ -16,10 +16,8 @@ import {
   LogIn,
   LogOut,
   Menu,
-  Moon,
   Shield,
   Sparkles,
-  Sun,
   UserPlus,
   Workflow,
   X,
@@ -28,7 +26,6 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { Logo } from "@/components/brand/logo";
 import { Button } from "@/components/ui/button";
-import { useTheme } from "@/components/theme-provider";
 import { useAuth } from "@/components/auth/auth-provider";
 import { confirmDiscard } from "@/lib/unsaved-guard";
 import { cn } from "@/lib/utils";
@@ -153,7 +150,6 @@ const NAV_MENUS: MenuGroup[] = [
 export function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
-  const { theme, toggleTheme } = useTheme();
   const { user, signOut, ready } = useAuth();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -352,21 +348,8 @@ export function Navbar() {
             </ul>
           </nav>
 
-        {/* Right region — theme toggle + auth menu, pushed to the end. */}
+        {/* Right region — auth menu, pushed to the end. */}
         <div className="ml-auto flex items-center gap-1.5">
-          <button
-            type="button"
-            onClick={toggleTheme}
-            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-            aria-label="Toggle theme"
-          >
-            {theme === "dark" ? (
-              <Sun className="h-4 w-4" />
-            ) : (
-              <Moon className="h-4 w-4" />
-            )}
-          </button>
-
           {/* Auth / account menu */}
           {!ready ? (
             <div className="hidden md:block h-8 w-24" aria-hidden />

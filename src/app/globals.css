@@ -1,8 +1,10 @@
 @import "tailwindcss";
 
-@custom-variant dark (&:where(.dark, .dark *));
-
 :root {
+  /* The site is light only. Without this a system set to dark still
+     renders form controls, scrollbars and iframes dark against it. */
+  color-scheme: light;
+
   --background: 255 255 255;
   --foreground: 9 9 11;
   --muted: 250 250 252;
@@ -20,24 +22,6 @@
   --gradient-from: 99 102 241;
   --gradient-via: 139 92 246;
   --gradient-to: 236 72 153;
-}
-
-.dark {
-  --background: 9 9 11;
-  --foreground: 244 244 245;
-  --muted: 24 24 27;
-  --muted-foreground: 161 161 170;
-  --border: 39 39 42;
-  --border-strong: 63 63 70;
-  --card: 17 17 19;
-  --accent: 24 24 27;
-  --primary: 244 244 245;
-  --primary-foreground: 9 9 11;
-  --ring: 244 244 245;
-  --grid: 39 39 42;
-  --gradient-from: 129 140 248;
-  --gradient-via: 167 139 250;
-  --gradient-to: 244 114 182;
 }
 
 @theme inline {
