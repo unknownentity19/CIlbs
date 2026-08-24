@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { ArrowRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FieldError, FieldHint, Input, Label } from "@/components/ui/input";
@@ -46,6 +46,13 @@ export function SignInForm({ providers }: { providers: AuthProviders }) {
     ? (OAUTH_ERRORS[oauthError] ?? "That sign-in attempt didn't complete.")
     : null;
   const [pending, setPending] = useState(false);
+  // Until React has hydrated, this form has no submit handler — and a click on
+  // a submit button in a form with no `action` makes the browser do a native
+  // GET to the same URL, which silently reloads the page and discards whatever
+  // was typed. On a cold start that window is seconds long and looks exactly
+  // like "nothing happened", so the button waits for its handler.
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => setHydrated(true), []);
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -134,7 +141,7 @@ export function SignInForm({ providers }: { providers: AuthProviders }) {
             type="submit"
             size="md"
             className="w-full mt-1"
-            disabled={pending}
+            disabled={pending || !hydrated}
           >
             {pending ? (
               <>

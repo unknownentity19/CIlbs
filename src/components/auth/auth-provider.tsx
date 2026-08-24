@@ -32,13 +32,15 @@ type AuthContextValue = {
   user: User | null;
   /** False until the session has been resolved, so UI can hold its shape. */
   ready: boolean;
-  signIn: (input: { email: string; password: string }) => Promise<User>;
+  /** Resolves once the session cookie is set. Throws with a readable message
+   * if the credentials are refused. */
+  signIn: (input: { email: string; password: string }) => Promise<void>;
   signUp: (input: {
     email: string;
     password: string;
     name: string;
     workspace?: string;
-  }) => Promise<User>;
+  }) => Promise<void>;
   /**
    * Resolves once the session is actually gone. Awaiting it matters: the
    * fire-and-forget version let callers navigate first, so a visitor could
@@ -84,15 +86,20 @@ function AuthBridge({ children }: { children: React.ReactNode }) {
             : "That email and password don't match an account.",
         );
       }
-      const next = await update();
-      const signedIn = next?.user;
-      if (!signedIn?.id) throw new Error("Could not start a session.");
-      return {
-        id: signedIn.id,
-        email: signedIn.email ?? input.email,
-        name: signedIn.name ?? input.email,
-        workspace: signedIn.workspace ?? "personal",
-      };
+
+      // The session cookie is set by the response above; that is the thing
+      // that matters, and the server reads it on the very next navigation.
+      //
+      // This used to gate success on `update()` returning a user, which is a
+      // race it frequently loses: `update()` kicks off a refetch and resolves
+      // with the session it has *now*, which is still null. A successful
+      // sign-in was then reported as "Could not start a session" and the
+      // caller never navigated — the visitor stayed on the form while being,
+      // in fact, signed in.
+      //
+      // The refresh still happens, so client components see the new session;
+      // it just no longer decides whether sign-in worked.
+      void update();
     }
 
     return {
@@ -103,7 +110,7 @@ function AuthBridge({ children }: { children: React.ReactNode }) {
         const result = await createAccount(input);
         if (!result.ok) throw new Error(result.error);
         // Creating the account signs you straight in — no second form.
-        return signIn({ email: input.email, password: input.password });
+        await signIn({ email: input.email, password: input.password });
       },
       async signOut() {
         await authSignOut({ redirect: false });

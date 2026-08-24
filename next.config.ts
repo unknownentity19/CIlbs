@@ -31,7 +31,13 @@ const BASELINE_CSP = [
   "base-uri 'self'",
   "form-action 'self'",
   "frame-ancestors 'none'",
-  "upgrade-insecure-requests",
+  // No `upgrade-insecure-requests`: every resource here is same-origin and
+  // relative, so there is no mixed content for it to fix, and HSTS already
+  // forces HTTPS on the real domain. Meanwhile Safari applies it to
+  // plain-HTTP origins too — rewriting every asset request to https://,
+  // where it fails on TLS. That leaves no JavaScript loaded and the whole
+  // app dead in Safari against any local build. Chromium ignores it for
+  // localhost, so the breakage is invisible unless you test in Safari.
 ].join("; ");
 
 const nextConfig: NextConfig = {
