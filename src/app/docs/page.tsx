@@ -98,16 +98,16 @@ export default function DocsPage() {
 npm install -g @cilbs/cli
 
 # Authenticate
-hyp login
+cilbs login
 
 # Create a workflow from a template
-hyp new lead-router --template starter
+cilbs new lead-router --template starter
 
 # Deploy
-cd lead-router && hyp deploy`}
+cd lead-router && cilbs deploy`}
                 </CodeBlock>
                 <p>
-                  After <code className="font-mono text-foreground">hyp deploy</code>, your
+                  After <code className="font-mono text-foreground">cilbs deploy</code>, your
                   workflow is live at{" "}
                   <code className="font-mono text-foreground">
                     https://api.cilbs.com/v1/workflows/lead-router/run
@@ -191,7 +191,7 @@ steps:
                 </CodeBlock>
                 <p>
                   You can deploy this workflow with{" "}
-                  <code className="font-mono">hyp deploy</code> and call it
+                  <code className="font-mono">cilbs deploy</code> and call it
                   immediately at the path defined in <code className="font-mono">trigger</code>.
                 </p>
               </DocBlock>
