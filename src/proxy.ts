@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { INLINE_SCRIPT_HASHES } from "@/lib/inline-scripts";
 
 /**
  * Edge gate for authenticated routes. (Next 16 renamed `middleware` to
@@ -31,8 +32,19 @@ function strictCsp(nonce: string) {
   return [
     "default-src 'self'",
     // React uses eval in development to rebuild server stacks in the browser.
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${isDev ? " 'unsafe-eval'" : ""}`,
-    `style-src 'self' 'nonce-${nonce}' 'unsafe-inline'`,
+    // The layout's two inline snippets are allowed by hash. A nonce can't
+    // reach them: the root layout is shared with the static marketing pages,
+    // and reading the per-request nonce there would make the whole site
+    // render dynamically. 'strict-dynamic' ignores host sources like 'self'
+    // for scripts but leaves hashes in force, so both mechanisms coexist.
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' ${INLINE_SCRIPT_HASHES.join(" ")}${isDev ? " 'unsafe-eval'" : ""}`,
+    // Deliberately no nonce here. A nonce (or hash) makes CSP *ignore* the
+    // 'unsafe-inline' beside it, which blocked every server-rendered
+    // `style="..."` attribute — including the ones that position nodes on the
+    // studio canvas, so the first paint of a saved workflow came out
+    // unstyled. Inline styles are a far smaller risk than inline scripts,
+    // and React plus Tailwind emit too many to enumerate.
+    "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: blob:",
     "font-src 'self' data:",
     "connect-src 'self'",

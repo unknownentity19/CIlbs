@@ -9,6 +9,7 @@ import { Footer } from "@/components/layout/footer";
 import { NavigationGuard } from "@/components/navigation-guard";
 import { PageTransition } from "@/components/motion/page-transition";
 import { SITE } from "@/lib/site";
+import { GFX_LITE_SCRIPT, THEME_SCRIPT } from "@/lib/inline-scripts";
 
 // Bricolage Grotesque is a humanist sans with a tech edge — pairs well with
 // Cilbs's gradient hero and feels distinct from the default Geist used by
@@ -112,22 +113,12 @@ export default function RootLayout({
             GPU drivers when the studio is opened in Chrome's "Desktop site"
             mode, where width/pointer media queries no longer match. Running
             synchronously here avoids a first-frame composite with blur on. */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html:
-              "try{if(navigator.maxTouchPoints>0||matchMedia('(any-pointer:coarse)').matches){document.documentElement.classList.add('gfx-lite')}}catch(e){}",
-          }}
-        />
+        <script dangerouslySetInnerHTML={{ __html: GFX_LITE_SCRIPT }} />
         {/* Apply the saved theme before first paint. ThemeProvider can only
             read localStorage after hydration, so without this a returning
             dark-mode visitor gets a full-brightness flash of the light theme
             on every page load. */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html:
-              "try{var t=localStorage.getItem('cilbs-theme')||localStorage.getItem('hypero-theme');if(t==='dark'||t==='light'){document.documentElement.classList.toggle('dark',t==='dark');document.documentElement.style.colorScheme=t}}catch(e){}",
-          }}
-        />
+        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
         {/* Scroll reveals start hidden and are un-hidden by an observer once
             React mounts. With JavaScript disabled that never happens, so
             every revealed section would render blank — this puts the page
