@@ -1,18 +1,22 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
 import { ArrowRight, Check, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FieldError, FieldHint, Input, Label } from "@/components/ui/input";
 import { useAuth } from "@/components/auth/auth-provider";
+import { goAfterAuth, safeDestination } from "@/lib/post-auth-navigation";
 import { SocialButtons } from "@/components/auth/social-buttons";
 import type { AuthProviders } from "@/components/auth/use-providers";
 
 export function SignUpForm({ providers }: { providers: AuthProviders }) {
   const { signUp } = useAuth();
-  const router = useRouter();
+  // A visitor gated out of /studio arrives here from /signin?next=/studio via
+  // the "Create an account" link. Without this they'd be sent to /dashboard
+  // and the editor they actually asked for would be quietly forgotten.
+  const next = safeDestination(useSearchParams().get("next"));
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -34,7 +38,7 @@ export function SignUpForm({ providers }: { providers: AuthProviders }) {
     setPending(true);
     try {
       await signUp({ email, password, name, workspace });
-      router.push("/dashboard");
+      goAfterAuth(next);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
     } finally {
@@ -53,7 +57,7 @@ export function SignUpForm({ providers }: { providers: AuthProviders }) {
         </p>
       </div>
 
-      <SocialButtons oauth={providers.oauth} />
+      <SocialButtons oauth={providers.oauth} callbackUrl={next} />
 
       {providers.oauth.length > 0 && providers.credentials ? (
         <div className="my-6 flex items-center gap-3 text-xs text-muted-foreground">
@@ -171,7 +175,7 @@ export function SignUpForm({ providers }: { providers: AuthProviders }) {
       <p className="mt-8 text-center text-sm text-muted-foreground">
         Already have an account?{" "}
         <Link
-          href="/signin"
+          href={`/signin?next=${encodeURIComponent(next)}`}
           className="font-medium text-foreground hover:underline underline-offset-4"
         >
           Sign in

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { isGatedRoute } from "@/lib/gated-routes";
 import { INLINE_SCRIPT_HASHES } from "@/lib/inline-scripts";
 
 /**
@@ -12,8 +13,6 @@ import { INLINE_SCRIPT_HASHES } from "@/lib/inline-scripts";
  * page and every server action call `getSession()` / `requireUser()`. So this
  * is a cheap redirect for the common case, not the security boundary.
  */
-
-const PROTECTED = ["/dashboard", "/studio"];
 
 /** Auth.js v5 cookie names; the `__Secure-` prefix is used over HTTPS. */
 const SESSION_COOKIES = [
@@ -64,7 +63,7 @@ function strictCsp(nonce: string) {
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  if (!PROTECTED.some((p) => pathname === p || pathname.startsWith(`${p}/`))) {
+  if (!isGatedRoute(pathname)) {
     return NextResponse.next();
   }
 
@@ -86,6 +85,10 @@ export function proxy(request: NextRequest) {
   return response;
 }
 
+// Next parses this at build time, so it has to be a literal — computing it
+// from GATED_ROUTES fails the build with "matcher needs to be a static string
+// or array of static strings". `tests/gated-routes.test.ts` asserts the two
+// stay in step instead.
 export const config = {
   matcher: ["/dashboard/:path*", "/studio/:path*"],
 };

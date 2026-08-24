@@ -202,6 +202,11 @@ export function CommandPaletteProvider({
                           icon={<LogOut className="h-4 w-4" />}
                           label="Sign out"
                           onSelect={async () => {
+                            // The palette opens over the studio, so signing
+                            // out from here can discard unsaved canvas work.
+                            // Both navbar sign-out buttons ask first; this one
+                            // didn't, and dropped it silently.
+                            if (!confirmDiscard()) return;
                             setIsOpen(false);
                             await signOut();
                             router.push("/");

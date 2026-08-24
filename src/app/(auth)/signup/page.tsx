@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+import { Loader2 } from "lucide-react";
 import { hasCredentialsAuth, oauthProviders } from "@/lib/env";
 import { SignUpForm } from "./signup-form";
 
@@ -8,14 +10,24 @@ import { SignUpForm } from "./signup-form";
 export default async function SignUpPage() {
   const configured = oauthProviders();
   return (
-    <SignUpForm
-      providers={{
-        oauth: [
-          ...(configured.github ? ["github"] : []),
-          ...(configured.google ? ["google"] : []),
-        ],
-        credentials: hasCredentialsAuth(),
-      }}
-    />
+    // The form reads `?next=` from the URL, which needs a boundary to
+    // prerender around.
+    <Suspense
+      fallback={
+        <div className="flex h-64 items-center justify-center text-muted-foreground">
+          <Loader2 className="h-4 w-4 animate-spin" />
+        </div>
+      }
+    >
+      <SignUpForm
+        providers={{
+          oauth: [
+            ...(configured.github ? ["github"] : []),
+            ...(configured.google ? ["google"] : []),
+          ],
+          credentials: hasCredentialsAuth(),
+        }}
+      />
+    </Suspense>
   );
 }

@@ -86,6 +86,56 @@ test.describe("accounts", () => {
     await expect(page).toHaveURL(/\/signin/);
   });
 
+  /**
+   * Regression: a signed-out visitor's browser prefetched /studio, the edge
+   * gate answered with a redirect to /signin, and the client cached that as
+   * the route's entry. Signing in did not clear it — only a document load
+   * does — so `router.push("/studio")` replayed the cached redirect and put
+   * the visitor back on the form. Signing in again did the same thing.
+   *
+   * Every step after the first load has to be a click, not `page.goto`: a
+   * document load clears the client cache and the bug disappears, which is
+   * exactly why the original verification of this flow passed while the real
+   * click-through failed.
+   */
+  test("reaches the studio by clicking through from a signed-out page", async ({
+    page,
+  }) => {
+    const prefetches: string[] = [];
+    page.on("request", (request) => {
+      const url = new URL(request.url());
+      if (
+        url.pathname === "/studio" &&
+        request.headers()["next-router-prefetch"]
+      ) {
+        prefetches.push(url.pathname);
+      }
+    });
+
+    // This project ships a signed-in storageState, and the whole point here is
+    // to start signed out — so drop the session before the first load.
+    await page.context().clearCookies();
+
+    // The only full load in this test. Everything after it is a click: a
+    // document load clears the client cache, which is what hid this bug.
+    await page.goto("/");
+    await page.getByRole("button", { name: /^Product$/ }).click();
+    await page.getByRole("link", { name: /Studio/ }).first().click();
+    await expect(page).toHaveURL(/\/signin/);
+
+    // Nothing should have prefetched the gated route on the way here.
+    expect(prefetches).toEqual([]);
+
+    await page.getByLabel(/^(Work )?email$/i).fill(email);
+    await page.getByLabel("Password").fill(password);
+    await page.getByRole("button", { name: /^Sign in$/ }).click();
+
+    await expect(page).toHaveURL(/\/studio/, { timeout: 30_000 });
+    await expect(page.getByLabel("Workflow canvas")).toBeVisible({
+      timeout: 30_000,
+    });
+  });
+
   test("an address can't be registered twice", async ({ page }) => {
     await page.goto("/signup");
     await page.getByLabel("Full name").fill("Ada Again");

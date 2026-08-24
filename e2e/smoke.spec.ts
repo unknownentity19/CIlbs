@@ -67,6 +67,53 @@ for (const gated of ["/dashboard", "/studio"]) {
   });
 }
 
+/**
+ * Guards the root cause of the sign-in bounce, without needing a database.
+ *
+ * `<Link>` prefetches by default, and a prefetch of a gated route is answered
+ * by the edge gate — so a signed-out visitor's browser cached "redirect to
+ * /signin" as the entry for /studio and kept being sent there after signing
+ * in. These links must not prefetch. The home page carries two /studio CTAs
+ * and the footer carries a third on every page.
+ */
+test("never prefetches a gated route for a signed-out visitor", async ({
+  page,
+  isMobile,
+}) => {
+  const prefetched: string[] = [];
+  page.on("request", (request) => {
+    const { pathname } = new URL(request.url());
+    if (
+      /^\/(studio|dashboard)$/.test(pathname) &&
+      request.headers()["next-router-prefetch"]
+    ) {
+      prefetched.push(pathname);
+    }
+  });
+
+  await page.goto("/");
+  // Scroll the footer in, which is where the always-present /studio link is.
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+  await page.waitForTimeout(1500);
+  await page.evaluate(() => window.scrollTo(0, 0));
+
+  // Then open the menus that list both gated routes. On a phone they all live
+  // in one panel behind the hamburger, which mounts every item at once — the
+  // worst case, since a single tap puts both /studio and /dashboard on screen.
+  if (isMobile) {
+    await page.getByRole("button", { name: /Toggle menu/i }).click();
+    await page.waitForTimeout(1500);
+  } else {
+    await page.getByRole("button", { name: /^Product$/ }).click();
+    await page.waitForTimeout(800);
+    await page.keyboard.press("Escape");
+    await page.getByRole("button", { name: /^Resources$/ }).click();
+    await page.waitForTimeout(800);
+  }
+
+  expect(prefetched).toEqual([]);
+});
+
 test("robots keeps crawlers out of the gated pages", async ({ request }) => {
   const txt = await (await request.get("/robots.txt")).text();
   expect(txt).toContain("Disallow: /studio");

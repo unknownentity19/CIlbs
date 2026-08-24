@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { prefetchFor } from "@/lib/gated-routes";
 import { Logo } from "@/components/brand/logo";
 
 const COLUMNS = [
@@ -74,6 +75,7 @@ export function Footer() {
                     ) : (
                       <Link
                         href={link.href}
+                        prefetch={prefetchFor(link.href)}
                         className="text-sm text-muted-foreground transition-colors hover:text-foreground"
                       >
                         {link.label}

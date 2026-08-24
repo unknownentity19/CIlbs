@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Container, Section } from "@/components/ui/section";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/components/auth/auth-provider";
+import { prefetchFor } from "@/lib/gated-routes";
 
 const SAMPLE_WORKFLOWS = [
   {
@@ -204,6 +205,7 @@ export function DashboardView() {
                   <li key={q.title}>
                     <Link
                       href={q.href}
+                      prefetch={prefetchFor(q.href)}
                       className="flex items-start gap-3 px-5 py-4 transition-colors hover:bg-accent"
                     >
                       <span className="mt-0.5 inline-flex h-7 w-7 items-center justify-center rounded-md bg-accent border border-border text-foreground">

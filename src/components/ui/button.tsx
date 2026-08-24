@@ -1,5 +1,6 @@
 import * as React from "react";
 import Link from "next/link";
+import { prefetchFor } from "@/lib/gated-routes";
 import { cn } from "@/lib/utils";
 
 type Variant = "primary" | "secondary" | "ghost" | "outline";
@@ -66,7 +67,16 @@ export function Button(props: ButtonProps) {
       );
     }
     return (
-      <Link className={classes} href={href} {...rest}>
+      // `prefetchFor` turns prefetching off for the gated routes. A prefetch
+      // of one is answered by the edge gate, so a signed-out visitor caches a
+      // redirect to /signin as that route's entry — and keeps being sent
+      // there after signing in. See src/lib/gated-routes.ts.
+      <Link
+        className={classes}
+        href={href}
+        prefetch={prefetchFor(href)}
+        {...rest}
+      >
         {children}
       </Link>
     );

@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
 import { ArrowRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FieldError, FieldHint, Input, Label } from "@/components/ui/input";
 import { useAuth } from "@/components/auth/auth-provider";
+import { goAfterAuth, safeDestination } from "@/lib/post-auth-navigation";
 import { SocialButtons } from "@/components/auth/social-buttons";
 import type { AuthProviders } from "@/components/auth/use-providers";
 
@@ -23,15 +24,10 @@ const OAUTH_ERRORS: Record<string, string> = {
 
 export function SignInForm({ providers }: { providers: AuthProviders }) {
   const { signIn } = useAuth();
-  const router = useRouter();
   const params = useSearchParams();
   // Only allow same-origin relative paths to avoid open-redirect attacks
   // (e.g. ?next=//evil.com or ?next=https://evil.com).
-  const nextParam = params.get("next");
-  const next =
-    nextParam && nextParam.startsWith("/") && !nextParam.startsWith("//")
-      ? nextParam
-      : "/dashboard";
+  const next = safeDestination(params.get("next"));
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -60,7 +56,7 @@ export function SignInForm({ providers }: { providers: AuthProviders }) {
     setPending(true);
     try {
       await signIn({ email, password });
-      router.push(next);
+      goAfterAuth(next);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
     } finally {
@@ -169,7 +165,7 @@ export function SignInForm({ providers }: { providers: AuthProviders }) {
       <p className="mt-8 text-center text-sm text-muted-foreground">
         Don&apos;t have an account?{" "}
         <Link
-          href="/signup"
+          href={`/signup?next=${encodeURIComponent(next)}`}
           className="font-medium text-foreground hover:underline underline-offset-4"
         >
           Sign up free

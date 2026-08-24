@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { prefetchFor } from "@/lib/gated-routes";
 import { usePathname, useRouter } from "next/navigation";
 import {
   BookOpen,
@@ -310,6 +311,7 @@ export function Navbar() {
                               <li key={item.href}>
                                 <Link
                                   href={item.href}
+                                  prefetch={prefetchFor(item.href)}
                                   role="menuitem"
                                   onClick={() => setOpenMenu(null)}
                                   className={cn(
@@ -554,6 +556,7 @@ export function Navbar() {
                         <li key={item.href}>
                           <Link
                             href={item.href}
+                            prefetch={prefetchFor(item.href)}
                             onClick={() => setMobileOpen(false)}
                             className={cn(
                               "flex items-start gap-3 rounded-xl px-2.5 py-2 transition-colors",
@@ -645,6 +648,7 @@ function AccountMenuItem({
     <li>
       <Link
         href={href}
+        prefetch={prefetchFor(href)}
         onClick={onClick}
         role="menuitem"
         className="flex items-start gap-3 rounded-xl px-3 py-2.5 text-foreground transition-colors hover:bg-accent"
