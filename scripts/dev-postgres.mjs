@@ -1,5 +1,23 @@
-import EmbeddedPostgres from "embedded-postgres";
 import { mkdirSync, rmSync } from "node:fs";
+
+/**
+ * `embedded-postgres` is not a dependency of this project on purpose: it pulls
+ * ~144MB of Postgres binaries, which every Vercel build and CI run would then
+ * download for a tool only ever used on a developer machine. Install it when
+ * you want a local database.
+ */
+let EmbeddedPostgres;
+try {
+  ({ default: EmbeddedPostgres } = await import("embedded-postgres"));
+} catch {
+  console.error(
+    "This script needs a one-off dev dependency:\n\n" +
+      "  npm i --no-save embedded-postgres\n\n" +
+      "It downloads real Postgres binaries into node_modules and is deliberately\n" +
+      "not in package.json — see the comment at the top of this file.\n",
+  );
+  process.exit(1);
+}
 
 /**
  * A throwaway Postgres for local work and for the auth integration test.

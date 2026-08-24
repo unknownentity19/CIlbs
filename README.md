@@ -237,6 +237,7 @@ half needs an account, since the editor is behind sign-in, and runs only with
 `E2E_WITH_DB=1`:
 
 ```bash
+npm i --no-save embedded-postgres     # one-off, see "A local database" below
 node scripts/dev-postgres.mjs start
 DATABASE_URL=postgresql://cilbs:cilbs@127.0.0.1:55432/cilbs npm run db:migrate
 DATABASE_URL=... AUTH_SECRET=... npm run start -- --port 3100
@@ -360,7 +361,8 @@ directly; cookies are marked `Secure`, so sign-in only works over HTTPS.
 No hosted account needed to work on the account flow:
 
 ```bash
-node scripts/dev-postgres.mjs start   # downloads Postgres, listens on 55432
+npm i --no-save embedded-postgres     # one-off; ~144MB of Postgres binaries
+node scripts/dev-postgres.mjs start   # listens on 55432
 DATABASE_URL=postgresql://cilbs:cilbs@127.0.0.1:55432/cilbs npm run db:migrate
 ```
 
