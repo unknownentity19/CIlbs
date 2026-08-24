@@ -55,7 +55,7 @@ const COMPARISON: {
     agents: true,
   },
   {
-    label: "Multi-step branching & loops",
+    label: "Multi-step branching",
     cilbs: true,
     nocode: "partial",
     automation: "partial",

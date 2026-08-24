@@ -46,7 +46,7 @@ const PLANS: Plan[] = [
     description: "For teams shipping AI workflows in production.",
     price: "$29",
     cadence: "per seat / month",
-    cta: { label: "Start Pro trial", href: "/signup" },
+    cta: { label: "Request a trial", href: "mailto:hello@cilbs.com" },
     features: [
       "Unlimited workflows",
       "100,000 runs / month included",
@@ -61,7 +61,7 @@ const PLANS: Plan[] = [
     name: "Enterprise",
     description: "For organizations with security, scale, and compliance needs.",
     price: "Custom",
-    cta: { label: "Contact sales", href: "/product" },
+    cta: { label: "Contact sales", href: "mailto:hello@cilbs.com" },
     features: [
       "Unlimited everything",
       "Self-hosted or VPC deployment",
@@ -216,7 +216,7 @@ export default function PricingPage() {
           <SectionHeader
             eyebrow="Compare plans"
             title="A side-by-side look."
-            description="Every plan includes the visual canvas, AI agents, integrations, and the runtime. Limits and support are what change."
+            description="Every plan includes the visual canvas, AI agents, integrations, and the runtime. Limits, security features, and support are what change."
           />
           <Reveal delay={0.1} className="mt-12 overflow-hidden rounded-2xl border border-border bg-card">
             {/* Focusable + labelled: the table is wider than a phone, and a
@@ -347,7 +347,7 @@ export default function PricingPage() {
                 <Button href="/signup">
                   Start free <ArrowRight className="h-4 w-4" />
                 </Button>
-                <Button href="/product" variant="outline">
+                <Button href="mailto:hello@cilbs.com" variant="outline">
                   Talk to sales
                 </Button>
               </div>

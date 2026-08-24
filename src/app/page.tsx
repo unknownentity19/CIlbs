@@ -117,7 +117,7 @@ const HOW_IT_WORKS = [
   {
     n: "01",
     title: "Design on the canvas",
-    desc: "Drag triggers, agents, integrations, and logic onto a shared canvas. Iterate live with your team.",
+    desc: "Drag nodes out of the palette and wire them together. Iterate live with your team.",
     icon: <Workflow className="h-4 w-4" />,
   },
   {
@@ -138,7 +138,7 @@ const FEATURE_CARDS = [
   {
     icon: <Workflow className="h-4 w-4" />,
     title: "Visual workflow builder",
-    desc: "A canvas with nodes for triggers, branches, loops, and integrations. Multiplayer by default.",
+    desc: "A canvas with nodes for triggers, branches, and integrations. Multiplayer by default.",
     href: "/features#workflow-builder",
   },
   {
@@ -150,7 +150,7 @@ const FEATURE_CARDS = [
   {
     icon: <GitBranch className="h-4 w-4" />,
     title: "Durable execution",
-    desc: "Retries, parallel branches, dynamic loops, and pause-and-resume. Each run executes exactly once, even through failures.",
+    desc: "Retries, parallel branches, and pause-and-resume. Each run executes exactly once, even through failures.",
     href: "/features#multi-step",
   },
   {
@@ -227,7 +227,7 @@ const SECURITY = [
   },
   {
     icon: <Lock className="h-4 w-4" />,
-    title: "End-to-end encryption",
+    title: "Encrypted in transit and at rest",
     desc: "TLS in transit, AES-256 at rest, scoped credentials.",
   },
   {
@@ -733,7 +733,7 @@ export default function HomePage() {
   language="ts"
   code={`import { cilbs } from "@cilbs/sdk";
 
-const client = cilbs({ apiKey: process.env.HYP! });
+const client = cilbs({ apiKey: process.env.CILBS_API_KEY! });
 
 const result = await client.workflows
   .leadRouter

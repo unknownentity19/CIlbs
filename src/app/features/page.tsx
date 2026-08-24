@@ -96,13 +96,13 @@ const FEATURES: Feature[] = [
     description: (
       <>
         Underneath the canvas is a durable workflow engine. Steps run with
-        exactly-once semantics, branches and loops are first-class, and every
+        exactly-once semantics, branches are first-class, and every
         run is observable end-to-end with a replayable timeline.
       </>
     ),
     bullets: [
       "Durable retries with exponential backoff",
-      "Parallel branches and dynamic loops",
+      "Parallel branches and conditional routing",
       "Per-step timeouts and circuit breakers",
       "Pause, approve, and resume from anywhere",
     ],
@@ -260,7 +260,7 @@ export default function FeaturesPage() {
           <div className="flex flex-col items-center gap-6 rounded-3xl border border-border bg-card p-12 text-center">
             <SectionHeader
               title="Ready to get started?"
-              description="Everything you need to build and run intelligent workflows is here. Sign up free and start building."
+              description="Sign up and build your first workflow."
             />
             <div className="flex flex-wrap justify-center gap-3">
               <Button href="/signup">

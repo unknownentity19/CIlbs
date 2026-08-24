@@ -159,7 +159,7 @@ export default function SolutionsPage() {
               <h1 className="mt-4 text-5xl sm:text-6xl font-semibold tracking-tight leading-[1.05]">
                 Real workflows
                 <br />
-                <span className="text-gradient">for real teams.</span>
+                <span className="text-gradient">teams actually run.</span>
               </h1>
             </Reveal>
             <Reveal delay={0.15}>
@@ -224,7 +224,7 @@ export default function SolutionsPage() {
                 />
               </div>
               <div className="flex flex-wrap gap-3">
-                <Button href="/signup">
+                <Button href="mailto:hello@cilbs.com">
                   Talk to us <ArrowRight className="h-4 w-4" />
                 </Button>
                 <Button href="/features" variant="outline">

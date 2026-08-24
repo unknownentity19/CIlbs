@@ -129,8 +129,8 @@ cd lead-router && cilbs deploy`}
                   </li>
                   <li>
                     <strong>Node</strong> — a single step. Triggers, HTTP calls,
-                    database queries, conditions, loops, and agent calls are
-                    all nodes.
+                    database queries, conditions, transforms, and agent calls
+                    are all nodes.
                   </li>
                   <li>
                     <strong>Agent</strong> — a special node that reasons,
@@ -187,7 +187,11 @@ steps:
   - id: notify
     type: slack
     channel: "#sales"
-    text: "🚨 New high-priority lead from \${trigger.body.email}"`}
+    text: "🚨 New high-priority lead from \${trigger.body.email}"
+
+  - id: archive
+    type: postgres
+    query: insert into leads (email) values (\${trigger.body.email})`}
                 </CodeBlock>
                 <p>
                   You can deploy this workflow with{" "}
