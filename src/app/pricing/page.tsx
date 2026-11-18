@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 import { faqSchema, jsonLd } from "@/lib/structured-data";
 
 export const metadata: Metadata = {
-  // The root layout applies the `%s — Cilbs` template, so this is just
+  // The root layout applies the `%s · Cilbs` template, so this is just
   // the segment name — spelling out the suffix here rendered it twice.
   title: "Pricing",
   description:
@@ -140,7 +140,7 @@ const FAQ = [
   },
   {
     q: "Can Cilbs be self-hosted?",
-    a: "Yes — Enterprise customers can deploy Cilbs into their own VPC or on-prem environment. We provide a Helm chart, Terraform modules, and an upgrade path.",
+    a: "Yes. Enterprise customers can deploy Cilbs into their own VPC or on-prem environment. We provide a Helm chart, Terraform modules, and an upgrade path.",
   },
   {
     q: "Do you support educational or non-profit pricing?",
@@ -340,7 +340,7 @@ export default function PricingPage() {
                 Give it a try.
               </h2>
               <p className="text-muted-foreground">
-                Start on the free plan — no credit card needed. Upgrade when
+                Start on the free plan. No credit card needed. Upgrade when
                 you need more runs or team features.
               </p>
               <div className="flex flex-wrap justify-center gap-3">

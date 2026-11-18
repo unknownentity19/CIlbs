@@ -5,7 +5,7 @@ import { MARK_DATA_URI } from "@/components/brand/mark-data";
 // No `runtime = "edge"`: Next 16 deprecates the edge runtime, and running on
 // Node lets this card be generated at build time instead of on every request.
 
-export const alt = `${SITE.name} — ${SITE.shortDescription}`;
+export const alt = `${SITE.name} · ${SITE.shortDescription}`;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 

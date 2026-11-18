@@ -6,7 +6,7 @@ import type { Metadata } from "next";
  * and show up in search and link previews as the generic home page.
  */
 export const metadata: Metadata = {
-  // The root layout applies the `%s — Cilbs` template, so this is just
+  // The root layout applies the `%s · Cilbs` template, so this is just
   // the segment name — spelling out the suffix here rendered it twice.
   title: "Studio",
   description:

@@ -21,11 +21,11 @@ import {
 } from "@/components/visuals/feature-mocks";
 
 export const metadata: Metadata = {
-  // The root layout applies the `%s — Cilbs` template, so this is just
+  // The root layout applies the `%s · Cilbs` template, so this is just
   // the segment name — spelling out the suffix here rendered it twice.
   title: "Features",
   description:
-    "Visual workflow builder, AI agent creation, multi-step automation, integrations, API, and an AI reasoning layer — every Cilbs feature in detail.",
+    "Visual workflow builder, AI agent creation, multi-step automation, integrations, API, and an AI reasoning layer. Every Cilbs feature in detail.",
 };
 
 type Feature = {
@@ -108,7 +108,7 @@ const FEATURES: Feature[] = [
     ],
     useCase: {
       title: "Running a multi-step onboarding flow",
-      body: "An ops team kicks off a 14-step onboarding workflow on every new signup — provisioning, billing checks, and welcome emails — without writing a single cron job.",
+      body: "An ops team kicks off a 14-step onboarding workflow on every new signup, covering provisioning, billing checks, and welcome emails, without writing a single cron job.",
     },
     mock: <MockSteps />,
   },
@@ -143,7 +143,7 @@ const FEATURES: Feature[] = [
     tagline: "Inspect what the agent actually did, step by step.",
     description: (
       <>
-        Every agent run produces a full trace — what it planned, which tools it
+        Every agent run produces a full trace: what it planned, which tools it
         called, and why it made each decision. Compare two runs side-by-side
         and replay any trace against historical inputs.
       </>
@@ -169,7 +169,7 @@ const FEATURES: Feature[] = [
       <>
         Deploy Cilbs workflows the same way you deploy the rest of your
         backend. Each workflow gets a typed REST endpoint, an SDK, and
-        observability — rate limits and audit logs included.
+        observability, rate limits and audit logs included.
       </>
     ),
     bullets: [
@@ -207,7 +207,7 @@ export default function FeaturesPage() {
             <Reveal delay={0.15}>
               <p className="mt-6 text-lg text-muted-foreground leading-relaxed max-w-2xl">
                 Canvas, agents, workflow engine, integrations, and
-                observability — built together so they actually work together.
+                observability, built together so they actually work together.
               </p>
             </Reveal>
             <Reveal delay={0.25}>

@@ -14,7 +14,7 @@ import { Reveal } from "@/components/motion/reveal";
 import { Badge } from "@/components/ui/badge";
 
 export const metadata: Metadata = {
-  // The root layout applies the `%s — Cilbs` template, so this is just
+  // The root layout applies the `%s · Cilbs` template, so this is just
   // the segment name — spelling out the suffix here rendered it twice.
   title: "Solutions",
   description:
@@ -25,6 +25,8 @@ type Solution = {
   id: string;
   industry: string;
   icon: React.ReactNode;
+  /** Short form of `problem`, used as the section heading. */
+  headline: string;
   problem: string;
   approach: string;
   workflow: { title: string; steps: string[] };
@@ -36,10 +38,12 @@ const SOLUTIONS: Solution[] = [
     id: "saas",
     industry: "SaaS startups",
     icon: <Rocket className="h-4 w-4" />,
+    headline:
+      "Early-stage teams spend weeks gluing together prompts, cron jobs, and Zaps to ship one AI feature",
     problem:
-      "Early-stage teams spend weeks gluing together prompts, cron jobs, and Zaps to ship one AI feature — and none of it is easy to debug or hand off.",
+      "Early-stage teams spend weeks gluing together prompts, cron jobs, and Zaps to ship one AI feature, and none of it is easy to debug or hand off.",
     approach:
-      "With Cilbs, you prototype the feature on the canvas, expose it as an API, and embed it in the product. You iterate on the same thing that runs in production — no separate staging script.",
+      "With Cilbs, you prototype the feature on the canvas, expose it as an API, and embed it in the product. You iterate on the same thing that runs in production, with no separate staging script.",
     workflow: {
       title: "AI-powered onboarding assistant",
       steps: [
@@ -58,10 +62,12 @@ const SOLUTIONS: Solution[] = [
     id: "ecommerce",
     industry: "E-commerce automation",
     icon: <ShoppingBag className="h-4 w-4" />,
+    headline:
+      "Merchandising, support, and fulfillment teams operate across a dozen tools",
     problem:
-      "Merchandising, support, and fulfillment teams operate across a dozen tools — and every \"AI feature\" lives in a separate app with its own dashboard, billing, and on-call page.",
+      "Merchandising, support, and fulfillment teams operate across a dozen tools, and every \"AI feature\" lives in a separate app with its own dashboard, billing, and on-call page.",
     approach:
-      "Cilbs unifies product, support, and ops automations into one canvas. Trigger workflows from Shopify, fan out to inventory, generate listings with an agent, and notify merchants — all in one place.",
+      "Cilbs unifies product, support, and ops automations into one canvas. Trigger workflows from Shopify, fan out to inventory, generate listings with an agent, and notify merchants, all in one place.",
     workflow: {
       title: "Auto-generated product listings",
       steps: [
@@ -80,10 +86,11 @@ const SOLUTIONS: Solution[] = [
     id: "ops",
     industry: "Internal ops teams",
     icon: <Users className="h-4 w-4" />,
+    headline: "Ops teams own the long tail of business logic",
     problem:
-      "Ops teams own the long tail of business logic — invoicing edge cases, onboarding exceptions, vendor approvals — and figuring out how something works means finding the right person.",
+      "Ops teams own the long tail of business logic: invoicing edge cases, onboarding exceptions, vendor approvals. Figuring out how any of it works means finding the right person.",
     approach:
-      "Cilbs gives ops a visual canvas they own end-to-end. Agents handle the judgment calls — classification, drafting — deterministic steps handle the writes and approvals, and every run is logged.",
+      "Cilbs gives ops a visual canvas they own end-to-end. Agents handle the judgment calls like classification and drafting, deterministic steps handle the writes and approvals, and every run is logged.",
     workflow: {
       title: "Vendor invoice triage",
       steps: [
@@ -102,8 +109,9 @@ const SOLUTIONS: Solution[] = [
     id: "devtools",
     industry: "Developer tooling",
     icon: <Code2 className="h-4 w-4" />,
+    headline: "Dev tools teams want to ship AI features",
     problem:
-      "Dev tools teams want to ship AI features — PR review, code search, error triage — but maintaining the prompt + retrieval + evaluation stack pulls engineers off the core product.",
+      "Dev tools teams want to ship AI features like PR review, code search, and error triage, but maintaining the prompt, retrieval, and evaluation stack pulls engineers off the core product.",
     approach:
       "Cilbs acts as the AI backend for dev tools. Put retrieval, agents, and evaluations on a canvas, expose them as endpoints, and call them from the IDE, CLI, or dashboard.",
     workflow: {
@@ -124,8 +132,9 @@ const SOLUTIONS: Solution[] = [
     id: "ai-startups",
     industry: "AI startups",
     icon: <Sparkles className="h-4 w-4" />,
+    headline: "AI-native startups outgrow notebooks fast",
     problem:
-      "AI-native startups outgrow notebooks fast — but going from a working agent in Jupyter to a production endpoint usually means rewriting everything in TypeScript.",
+      "AI-native startups outgrow notebooks fast, but going from a working agent in Jupyter to a production endpoint usually means rewriting everything in TypeScript.",
     approach:
       "Cilbs lets you run that notebook agent in production without rewriting it. Prototype on the canvas, ship to the same endpoint, and use the trace viewer to debug it when something behaves unexpectedly.",
     workflow: {
@@ -264,7 +273,7 @@ function SolutionBlock({
           <h3 className="mt-5 text-2xl sm:text-3xl font-semibold tracking-tight">
             <span className="text-muted-foreground">The problem:</span>{" "}
             <span className="text-foreground">
-              {solution.problem.split(" — ")[0]}.
+              {solution.headline}.
             </span>
           </h3>
         </Reveal>

@@ -34,7 +34,7 @@ export async function createAccount(input: unknown): Promise<SignUpResult> {
     return {
       ok: false,
       error:
-        "Accounts aren't available yet — DATABASE_URL and AUTH_SECRET are not configured on this deployment.",
+        "Accounts aren't available yet. DATABASE_URL and AUTH_SECRET are not configured on this deployment.",
     };
   }
 

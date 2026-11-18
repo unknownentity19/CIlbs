@@ -6,7 +6,7 @@ import { Reveal } from "@/components/motion/reveal";
 import { Badge } from "@/components/ui/badge";
 
 export const metadata: Metadata = {
-  // The root layout applies the `%s — Cilbs` template, so this is just
+  // The root layout applies the `%s · Cilbs` template, so this is just
   // the segment name — spelling out the suffix here rendered it twice.
   title: "About",
   description:

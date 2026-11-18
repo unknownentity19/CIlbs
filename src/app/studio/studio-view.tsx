@@ -219,7 +219,7 @@ export function StudioView({
       if (edited && storage.workflow !== null) {
         setHydrated(true);
         notify(
-          "Kept the workflow you were editing — your saved one is still in your account.",
+          "Kept the workflow you were editing. Your saved one is still in your account.",
         );
         return;
       }
@@ -494,7 +494,7 @@ export function StudioView({
       setFitSignal((n) => n + 1);
       notify(`Imported “${wf.name}”.`);
     } catch {
-      notify("Couldn't read that file — is it valid JSON?");
+      notify("Couldn't read that file. Is it valid JSON?");
     }
   }
 
@@ -637,7 +637,7 @@ export function StudioView({
           <Badge
             variant="outline"
             className="hidden sm:inline-flex"
-            title="Sandbox — runs are simulated and your draft stays in this browser."
+            title="Sandbox: runs are simulated and your draft stays in this browser."
           >
             <Sparkles className="h-3 w-3" />
             Sandbox
@@ -664,7 +664,7 @@ export function StudioView({
             className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-border px-2 py-0.5 text-[10px] text-muted-foreground"
             title={
               cloud
-                ? "Saved to your account — this workflow follows you between devices."
+                ? "Saved to your account. This workflow follows you between devices."
                 : "Saved in this browser only. Sign in to keep it in your account."
             }
           >

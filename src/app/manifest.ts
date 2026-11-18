@@ -8,7 +8,7 @@ import { SITE } from "@/lib/site";
  */
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: `${SITE.name} — ${SITE.shortDescription}`,
+    name: `${SITE.name} · ${SITE.shortDescription}`,
     short_name: SITE.name,
     description: SITE.description,
     start_url: "/studio",

@@ -81,7 +81,7 @@ function AuthBridge({ children }: { children: React.ReactNode }) {
         // is a very different problem from a wrong password.
         throw new Error(
           result?.status === 503
-            ? "Accounts aren't available yet — this deployment has no database or session secret configured."
+            ? "Accounts aren't available yet. This deployment has no database or session secret configured."
             : "That email and password don't match an account.",
         );
       }

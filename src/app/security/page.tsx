@@ -49,7 +49,7 @@ const SECTIONS: LegalSection[] = [
         </p>
         <p>
           Infrastructure is defined as code and deployed through a reviewed
-          pipeline — there are no ad-hoc changes to production hosts.
+          pipeline. There are no ad-hoc changes to production hosts.
         </p>
       </>
     ),
@@ -87,7 +87,7 @@ const SECTIONS: LegalSection[] = [
           Internal access follows least privilege, is granted by role, requires
           multi-factor authentication and a company-managed device, and is
           reviewed quarterly. Access to customer content requires a documented
-          reason — typically a support request from you — and is logged.
+          reason, typically a support request from you, and is logged.
         </p>
         <p>
           On your side, workspaces support role-based permissions and audit
@@ -136,8 +136,8 @@ const SECTIONS: LegalSection[] = [
           written runbook: contain, fix, then review.
         </p>
         <p>
-          If an incident affects your data we notify you without undue delay —
-          and within 72 hours where the law requires it — with what happened,
+          If an incident affects your data we notify you without undue delay,
+          and within 72 hours where the law requires it, with what happened,
           what we did, and what you should do.
         </p>
       </>
@@ -162,7 +162,7 @@ export default function SecurityPage() {
     <LegalPage
       eyebrow="Security"
       title="Security at Cilbs"
-      intro="Workflows hold credentials and customer data, so the boring parts — encryption, isolation, access control, and a real disclosure process — matter more than the features."
+      intro="Workflows hold credentials and customer data, so the boring parts matter more than the features: encryption, isolation, access control, and a real disclosure process."
       updated={UPDATED}
       sections={SECTIONS}
       contact={{ label: "Report a vulnerability", email: "security@cilbs.com" }}

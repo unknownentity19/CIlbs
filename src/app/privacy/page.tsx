@@ -18,7 +18,7 @@ const SECTIONS: LegalSection[] = [
         <p>
           This policy covers cilbs.com, the Cilbs web application, and the API.
           It explains what we collect, why, and what you can do about it. It does
-          not cover third-party services you connect to a workflow — those are
+          not cover third-party services you connect to a workflow. Those are
           governed by their own policies, and the connection is yours to revoke.
         </p>
         <p>
@@ -37,8 +37,8 @@ const SECTIONS: LegalSection[] = [
           name, and authentication metadata. You give us this when you sign up.
         </p>
         <p>
-          <strong>Workflow content.</strong> The workflows you build — nodes,
-          configuration, prompts, and connected credentials — plus the run
+          <strong>Workflow content.</strong> The workflows you build, including nodes,
+          configuration, prompts, and connected credentials, plus the run
           history those workflows produce.
         </p>
         <p>
@@ -104,7 +104,7 @@ const SECTIONS: LegalSection[] = [
     body: (
       <>
         <p>
-          Infrastructure and tooling providers acting on our instructions —
+          Infrastructure and tooling providers acting on our instructions:
           hosting, database, email delivery, error monitoring, and payment
           processing. Each is bound by a data-processing agreement and receives
           only what it needs.
@@ -161,8 +161,8 @@ const SECTIONS: LegalSection[] = [
     body: (
       <>
         <p>
-          You can access, correct, export, or delete your data — most of it
-          directly in the product, and the rest by writing to us. You can object
+          You can access, correct, export, or delete your data, most of it
+          directly in the product and the rest by writing to us. You can object
           to processing based on legitimate interests, and you can withdraw
           consent for optional messages at any time.
         </p>

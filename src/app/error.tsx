@@ -29,7 +29,7 @@ export default function RouteError({
             Something broke on this page
           </h1>
           <p className="text-[15px] leading-relaxed text-muted-foreground">
-            The error has been reported. Retrying reloads just this section — you
+            The error has been reported. Retrying reloads just this section, so you
             won&apos;t lose anything else you had open.
           </p>
           {error.digest ? (

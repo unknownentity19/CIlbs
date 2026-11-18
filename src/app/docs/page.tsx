@@ -6,7 +6,7 @@ import { CodeBlock } from "@/components/docs/code-block";
 import { Badge } from "@/components/ui/badge";
 
 export const metadata: Metadata = {
-  // The root layout applies the `%s — Cilbs` template, so this is just
+  // The root layout applies the `%s · Cilbs` template, so this is just
   // the segment name — spelling out the suffix here rendered it twice.
   title: "Docs",
   description:
@@ -83,8 +83,7 @@ export default function DocsPage() {
                     className="text-foreground underline-offset-4 hover:underline"
                   >
                     cilbs.com
-                  </a>{" "}
-                  — the free tier is enough to follow along.
+                  </a>. The free tier is enough to follow along.
                 </p>
               </DocBlock>
 
@@ -123,17 +122,17 @@ cd lead-router && cilbs deploy`}
                 </p>
                 <ul>
                   <li>
-                    <strong>Workflow</strong> — a versioned graph of nodes. Each
+                    <strong>Workflow</strong>: a versioned graph of nodes. Each
                     workflow is callable as an API endpoint and observable via
                     the run inspector.
                   </li>
                   <li>
-                    <strong>Node</strong> — a single step. Triggers, HTTP calls,
+                    <strong>Node</strong>: a single step. Triggers, HTTP calls,
                     database queries, conditions, transforms, and agent calls
                     are all nodes.
                   </li>
                   <li>
-                    <strong>Agent</strong> — a special node that reasons,
+                    <strong>Agent</strong>: a special node that reasons,
                     selects tools, and produces structured outputs. Agents have
                     memory, guardrails, and a configurable model backend.
                   </li>
@@ -163,7 +162,7 @@ cd lead-router && cilbs deploy`}
               <DocBlock id="creating-workflows" title="Creating workflows">
                 <p>
                   Workflows can be authored visually in the canvas or
-                  declaratively in YAML. The two are isomorphic — every change
+                  declaratively in YAML. The two are isomorphic, and every change
                   in one updates the other.
                 </p>
                 <CodeBlock language="yaml">
@@ -289,19 +288,19 @@ guardrails:
                 </p>
                 <ul>
                   <li>
-                    <code className="font-mono text-foreground">run.started</code> — a
+                    <code className="font-mono text-foreground">run.started</code>: a
                     workflow run has begun.
                   </li>
                   <li>
-                    <code className="font-mono text-foreground">run.succeeded</code> — a run
+                    <code className="font-mono text-foreground">run.succeeded</code>: a run
                     completed without errors.
                   </li>
                   <li>
-                    <code className="font-mono text-foreground">run.failed</code> — a run
+                    <code className="font-mono text-foreground">run.failed</code>: a run
                     finished with an error.
                   </li>
                   <li>
-                    <code className="font-mono text-foreground">run.paused</code> — a run is
+                    <code className="font-mono text-foreground">run.paused</code>: a run is
                     waiting for a human approval step.
                   </li>
                 </ul>

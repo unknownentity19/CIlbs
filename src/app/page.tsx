@@ -104,7 +104,7 @@ const VALUE_PROPS = [
   {
     icon: <Bot className="h-4 w-4" />,
     title: "AI agents as steps",
-    desc: "Add an AI agent to any step. Memory, tool-calling, and guardrails are configured in one place — no custom wrapper code.",
+    desc: "Add an AI agent to any step. Memory, tool-calling, and guardrails are configured in one place, with no custom wrapper code.",
   },
   {
     icon: <Zap className="h-4 w-4" />,
@@ -205,7 +205,7 @@ const TESTIMONIALS = [
   },
   {
     quote:
-      "Cilbs is the first agent platform that feels like real software. Versioning, replay, observability — it all just works.",
+      "Cilbs is the first agent platform that feels like real software. Versioning, replay, and observability all just work.",
     name: "Jonas Becker",
     role: "Founding engineer · Greyloft",
     initials: "JB",
@@ -681,8 +681,8 @@ export default function HomePage() {
               <Reveal delay={0.1}>
                 <p className="mt-4 text-muted-foreground leading-relaxed">
                   Every workflow is a versioned artifact. Define it visually,
-                  in YAML, or both — they always stay in sync. Each deploy
-                  produces a typed REST endpoint and a TypeScript SDK.
+                  in YAML, or both, and the two always stay in sync. Each
+                  deploy produces a typed REST endpoint and a TypeScript SDK.
                 </p>
               </Reveal>
               <Reveal delay={0.15}>

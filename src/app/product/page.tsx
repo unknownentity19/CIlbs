@@ -8,7 +8,7 @@ import { ArchitectureDiagram } from "@/components/visuals/architecture-diagram";
 import { Badge } from "@/components/ui/badge";
 
 export const metadata: Metadata = {
-  // The root layout applies the `%s — Cilbs` template, so this is just
+  // The root layout applies the `%s · Cilbs` template, so this is just
   // the segment name — spelling out the suffix here rendered it twice.
   title: "Product",
   description:
@@ -29,7 +29,7 @@ const PRINCIPLES = [
   {
     icon: <Boxes className="h-4 w-4" />,
     title: "Built for production",
-    desc: "Versioning, observability, retries, and rollouts are part of the runtime — not afterthoughts you bolt on later.",
+    desc: "Versioning, observability, retries, and rollouts are part of the runtime, not afterthoughts you bolt on later.",
   },
 ];
 
@@ -155,7 +155,7 @@ export default function ProductPage() {
                   Most automation tools were built for a deterministic world:
                   if-this-then-that. Cilbs is different. Every node on the
                   canvas can call an AI model, run an agent, or branch on
-                  reasoning — without leaving the workflow.
+                  reasoning, all without leaving the workflow.
                 </p>
               </Reveal>
               <Reveal delay={0.15}>

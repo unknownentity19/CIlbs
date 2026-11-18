@@ -4,7 +4,7 @@ import { LegalPage, type LegalSection } from "@/components/legal/legal-page";
 export const metadata: Metadata = {
   title: "Terms",
   description:
-    "The agreement between you and Cilbs Labs Inc. — accounts, plans and billing, acceptable use, ownership of your content, and the limits of our liability.",
+    "The agreement between you and Cilbs Labs Inc., covering accounts, plans and billing, acceptable use, ownership of your content, and the limits of our liability.",
 };
 
 const UPDATED = "19 August 2026";
@@ -21,7 +21,7 @@ const SECTIONS: LegalSection[] = [
           behalf of a company, you confirm you are allowed to bind it.
         </p>
         <p>
-          If you don&apos;t accept these terms, don&apos;t use the service — the
+          If you don&apos;t accept these terms, don&apos;t use the service. The
           marketing pages are free to read either way.
         </p>
       </>
@@ -60,7 +60,7 @@ const SECTIONS: LegalSection[] = [
           days&apos; notice, never mid-period. Fees are exclusive of taxes.
         </p>
         <p>
-          Refunds are handled case by case — write to us and we will be
+          Refunds are handled case by case. Write to us and we will be
           reasonable about it.
         </p>
       </>
@@ -109,7 +109,7 @@ const SECTIONS: LegalSection[] = [
         </p>
         <p>
           You are responsible for having the rights to the data you put into the
-          service and for how you use what comes out of it — including checking
+          service and for how you use what comes out of it, including checking
           model output before acting on it.
         </p>
       </>
@@ -132,7 +132,7 @@ const SECTIONS: LegalSection[] = [
     title: "Third-party services and models",
     body: (
       <p>
-        Workflows can call services we don&apos;t operate — model providers,
+        Workflows can call services we don&apos;t operate: model providers,
         SaaS APIs, your own endpoints. Their terms govern their side, their
         outages are outside our control, and their charges are between you and
         them. We are not liable for what a third-party service does with data
@@ -157,7 +157,7 @@ const SECTIONS: LegalSection[] = [
     body: (
       <p>
         Except where your plan says otherwise, the service is provided &ldquo;as
-        is&rdquo; and without warranties of any kind — including merchantability,
+        is&rdquo; and without warranties of any kind, including merchantability,
         fitness for a particular purpose, and non-infringement. Automated systems
         and language models make mistakes; keep a human in the loop for decisions
         that matter.
@@ -185,7 +185,7 @@ const SECTIONS: LegalSection[] = [
         You can close your account at any time. We can suspend or terminate an
         account for a material breach of these terms, for non-payment, or if
         required by law. On termination your right to use the service ends and we
-        delete your data on the schedule described in the privacy policy — export
+        delete your data on the schedule described in the privacy policy. Export
         anything you need first.
       </p>
     ),

@@ -247,7 +247,7 @@ export const TEMPLATES: TemplateMeta[] = [
             y: 32,
             config: {
               channel: "#customer-success",
-              message: "⚠️ {{ input.name }} is trending to churn — {{ input.reason }}",
+              message: "⚠️ {{ input.name }} is trending to churn: {{ input.reason }}",
             },
           },
           {

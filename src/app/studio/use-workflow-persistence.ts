@@ -112,7 +112,7 @@ export function useWorkflowPersistence({
         setState("saved");
       } else {
         setError(
-          "This browser refused to store the draft — private browsing or a full disk.",
+          "This browser refused to store the draft, maybe private browsing or a full disk.",
         );
         setState("error");
       }
@@ -162,7 +162,7 @@ export function useWorkflowPersistence({
         setError(null);
       } else {
         setError(
-          "This browser refused to store the draft — private browsing or a full disk.",
+          "This browser refused to store the draft, maybe private browsing or a full disk.",
         );
       }
       setState(localOk ? "saved" : "error");
