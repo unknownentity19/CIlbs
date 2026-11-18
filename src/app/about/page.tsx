@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { ArrowRight, Coins, Compass, HeartHandshake, Sprout } from "lucide-react";
+import { ArrowRight, Coins, Gauge, HeartHandshake, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Container, Section, SectionHeader } from "@/components/ui/section";
 import { Reveal } from "@/components/motion/reveal";
@@ -10,24 +10,24 @@ export const metadata: Metadata = {
   // the segment name — spelling out the suffix here rendered it twice.
   title: "About",
   description:
-    "Cilbs is a bootstrapped, independently funded company. No VCs, no board, no growth-at-all-costs — just a small team building software we're proud of.",
+    "Cilbs is an early-stage, investor-backed company building AI workflow infrastructure teams run in production, with 3M+ runs a day behind a 99.99% uptime SLA.",
 };
 
 const VALUES = [
   {
+    icon: <Gauge className="h-4 w-4" />,
+    title: "Production-grade by default",
+    body: "Cilbs carries 3M+ runs a day behind a 99.99% uptime SLA. Versioned workflows, replayable runs, and no silent failures aren't roadmap items for us. They're the bar we had to clear before asking anyone to put real work on the platform.",
+  },
+  {
     icon: <Coins className="h-4 w-4" />,
-    title: "Bootstrapped, on purpose",
-    body: "We funded Cilbs ourselves and pay the bills with revenue from people who actually use the product. There are no investors to answer to and no clock ticking toward an exit — which means we get to make decisions that are good for the long run instead of good for the next funding round.",
+    title: "Backed for the long build",
+    body: "We raised from investors who fund infrastructure and understand that it takes years to get right. The capital buys engineering time and the room to do things properly, not a growth number we have to hit by the end of the quarter.",
   },
   {
-    icon: <Compass className="h-4 w-4" />,
-    title: "Customers, not a board",
-    body: "When you're bootstrapped, your customers are your only source of truth. If something we ship doesn't earn its keep, we hear about it fast. That feedback loop keeps us honest and keeps the roadmap grounded in real work rather than a pitch deck.",
-  },
-  {
-    icon: <Sprout className="h-4 w-4" />,
-    title: "Sustainable pace",
-    body: "We grow at the speed the business can actually support. That sometimes means we say no to shiny things, but it also means we're still going to be here in a few years — running the same workflows you built on day one.",
+    icon: <ShieldCheck className="h-4 w-4" />,
+    title: "The unglamorous parts first",
+    body: "SOC 2 Type II, encryption, access control, audit logs. A lot of young companies leave this for the day a big customer asks. We did it up front, because retrofitting security onto a system people already depend on usually breaks both.",
   },
   {
     icon: <HeartHandshake className="h-4 w-4" />,
@@ -49,17 +49,17 @@ export default function AboutPage() {
             </Reveal>
             <Reveal delay={0.05}>
               <h1 className="mt-4 text-5xl sm:text-6xl font-semibold tracking-tight leading-[1.05]">
-                We built Cilbs the
+                Early company,
                 <br />
-                <span className="text-gradient">bootstrapped way.</span>
+                <span className="text-gradient">production software.</span>
               </h1>
             </Reveal>
             <Reveal delay={0.15}>
               <p className="mt-6 text-lg text-muted-foreground leading-relaxed max-w-2xl">
-                Cilbs is a small, independent company. We didn&apos;t raise a
-                round — we started with our own savings, shipped something people
-                were willing to pay for, and reinvested from there. That single
-                decision shapes almost everything about how we work.
+                Cilbs is a young, well-funded company, and we&apos;re careful
+                about which of those two facts shows up in your workflows.
+                Teams run millions of executions a day on this platform. It
+                gets held to that standard, not to our age.
               </p>
             </Reveal>
           </div>
@@ -75,7 +75,7 @@ export default function AboutPage() {
                 <SectionHeader
                   align="left"
                   eyebrow="Our story"
-                  title="No investors. No hype cycle. Just the work."
+                  title="Built like infrastructure, not a demo."
                 />
               </Reveal>
             </div>
@@ -91,17 +91,19 @@ export default function AboutPage() {
                   </p>
                   <p>
                     When it worked well enough that other people wanted it, we
-                    had a choice: chase a big round and grow as fast as possible,
-                    or fund it ourselves and grow at a pace we could stand behind.
-                    We chose the second one. Every feature you see here was paid
-                    for by customers, not by venture capital.
+                    raised from Y Combinator, Sequoia, Andreessen Horowitz,
+                    Accel, Index Ventures, and South Park Commons, investors
+                    who back infrastructure rather than cycles. That money went
+                    somewhere unglamorous: isolation between runs, retries that
+                    don&apos;t duplicate work, audit trails, and the security
+                    review behind our SOC 2 Type II report.
                   </p>
                   <p>
-                    Being bootstrapped isn&apos;t a badge we wear for its own
-                    sake — it&apos;s just the setup that lets us keep our
-                    priorities straight. Fewer meetings about valuations, more
-                    time spent making the product better for the people who
-                    actually use it.
+                    Being early isn&apos;t an excuse we get to use. Nobody
+                    running onboarding or billing on Cilbs cares how much we
+                    raised. They care that the 3am run behaves exactly like
+                    the 3pm one. So we size the roadmap to what we can support
+                    properly, and ship fewer things we&apos;d have to caveat.
                   </p>
                 </div>
               </Reveal>
@@ -150,7 +152,7 @@ export default function AboutPage() {
                 <SectionHeader
                   align="left"
                   title="Want to build with us?"
-                  description="If a small, independent team that answers to its customers sounds like your kind of software, give Cilbs a try. We think you'll feel the difference."
+                  description="If a focused team shipping infrastructure you can actually put production work on sounds like your kind of software, give Cilbs a try. We think you'll feel the difference."
                 />
               </div>
               <div className="flex flex-wrap gap-3">

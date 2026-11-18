@@ -7,7 +7,7 @@ const PUBLIC_PAGES = [
   { path: "/features", heading: /./ },
   { path: "/pricing", heading: /./ },
   { path: "/docs", heading: /Build with Cilbs/i },
-  { path: "/about", heading: /bootstrapped/i },
+  { path: "/about", heading: /production software/i },
   { path: "/privacy", heading: /Privacy Policy/i },
   { path: "/terms", heading: /Terms of Service/i },
   { path: "/security", heading: /Security at Cilbs/i },

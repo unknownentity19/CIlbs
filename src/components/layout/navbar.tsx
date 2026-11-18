@@ -123,7 +123,7 @@ const NAV_MENUS: MenuGroup[] = [
         label: "About",
         href: "/about",
         icon: Info,
-        description: "Independent and bootstrapped — the team behind Cilbs.",
+        description: "Investor-backed and built for production. The team behind Cilbs.",
       },
       {
         label: "Solutions",
